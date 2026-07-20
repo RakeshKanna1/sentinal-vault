@@ -1,42 +1,33 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+<svg width="100%" height="100%" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <!-- Background & Neon Gradients -->
-    <radialGradient id="bgGrad" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#141428"/>
-      <stop offset="100%" stop-color="#06060c"/>
-    </radialGradient>
-
-    <linearGradient id="cyberBorder" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#00f0ff"/>
-      <stop offset="50%" stop-color="#7000ff"/>
-      <stop offset="100%" stop-color="#ff007f"/>
+    <linearGradient id="sentinelGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f0ff" />
+      <stop offset="50%" stop-color="#7000ff" />
+      <stop offset="100%" stop-color="#ff007f" />
     </linearGradient>
 
-    <linearGradient id="iconGlow" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#00f0ff"/>
-      <stop offset="100%" stop-color="#a855f7"/>
+    <linearGradient id="sentinelCore" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#00f0ff" />
     </linearGradient>
 
-    <filter id="neonGlow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="10" result="blur"/>
-      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="4" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
     </filter>
   </defs>
 
-  <!-- Background Base Badge -->
-  <rect x="24" y="24" width="464" height="464" rx="110" fill="url(#bgGrad)" stroke="url(#cyberBorder)" stroke-width="16" filter="url(#neonGlow)"/>
+  <rect width="100" height="100" rx="24" fill="#06060c" />
+  
+  <g filter="url(#glow)">
+    <!-- Outer Diamond Shield Framework -->
+    <polygon points="50,10 88,32 88,68 50,90 12,68 12,32" fill="rgba(8, 9, 16, 0.9)" stroke="url(#sentinelGrad)" stroke-width="4.5" stroke-linejoin="round" />
+    <polygon points="50,18 80,36 80,64 50,82 20,64 20,36" fill="none" stroke="rgba(0, 240, 255, 0.3)" stroke-width="1.8" stroke-dasharray="3 3" />
 
-  <!-- Outer Sentinel Cyber Shield -->
-  <path d="M256 85 L380 140 V245 C380 340 315 410 256 440 C197 410 132 340 132 245 V140 Z" fill="none" stroke="url(#cyberBorder)" stroke-width="18" stroke-linejoin="round"/>
-
-  <!-- Inner Lock / Key Emblem -->
-  <g filter="url(#neonGlow)">
-    <!-- Lock Body -->
-    <rect x="196" y="235" width="120" height="105" rx="20" fill="url(#iconGlow)"/>
-    <!-- Lock Shackle -->
-    <path d="M220 235 V190 C220 155 236 140 256 140 C276 140 292 155 292 190 V235" fill="none" stroke="url(#iconGlow)" stroke-width="22" stroke-linecap="round"/>
-    <!-- Keyhole -->
-    <circle cx="256" cy="275" r="12" fill="#06060c"/>
-    <polygon points="251,282 261,282 264,312 248,312" fill="#06060c"/>
+    <!-- Inner Cyber Key Emblem -->
+    <path d="M50 30 C42 30 36 36 36 44 C36 50 40 55 45 57 V68 L40 73 V77 H45 V81 H55 V75 L55 57 C60 55 64 50 64 44 C64 36 58 30 50 30 Z" fill="url(#sentinelCore)" />
+    
+    <!-- Key Center Core -->
+    <circle cx="50" cy="42" r="4.5" fill="#06060c" />
   </g>
 </svg>

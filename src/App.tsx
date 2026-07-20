@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
-  Lock, Key, Eye, EyeOff, Copy, Plus, Search, 
+  Lock, Eye, EyeOff, Copy, Plus, Search, 
   Trash2, Edit3, RefreshCw, 
   Download, Upload, X, Check, ShieldAlert, Gamepad2, Laptop,
   FileText, Fingerprint
 } from 'lucide-react';
 import { encryptText, decryptText } from './utils/crypto';
 import { generatePasswordsFromGame } from './utils/gamePasswordGenerator';
+import { SentinelLogo } from './components/SentinelLogo';
 import './App.css';
 
 
@@ -1070,8 +1071,8 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
       {!isUnlocked && (
         <div className="lock-screen">
           <div className="lock-box">
-            <div className="lock-icon-container">
-              {isInitialized ? <Lock size={36} /> : <Key size={36} />}
+            <div className="lock-icon-container" style={{ background: 'transparent', border: 'none', boxShadow: 'none' }}>
+              <SentinelLogo size={64} />
             </div>
             
             <h1 className="lock-title">
@@ -1142,8 +1143,8 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
           {/* HEADER */}
           <header className="vault-header">
             <div className="brand-section">
-              <div className="brand-logo">
-                <Gamepad2 size={24} />
+              <div className="brand-logo" style={{ background: 'transparent', boxShadow: 'none' }}>
+                <SentinelLogo size={36} />
               </div>
               <h1 className="brand-title">
                 SENTINEL<span>// VAULT</span>
