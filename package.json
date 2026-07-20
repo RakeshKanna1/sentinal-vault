@@ -35,8 +35,8 @@
     "vite": "^8.1.1"
   },
   "build": {
-    "appId": "com.sentinel.vault",
-    "productName": "SentinelVault",
+    "appId": "com.rakexura.vault",
+    "productName": "RakexuraVault",
     "directories": {
       "output": "release"
     },

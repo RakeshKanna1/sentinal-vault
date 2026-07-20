@@ -575,11 +575,11 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
       const credential = (await navigator.credentials.create({
         publicKey: {
           challenge,
-          rp: { name: 'Sentinel Vault' },
+          rp: { name: 'Rakexura Vault' },
           user: {
             id: userId,
-            name: 'Sentinel User',
-            displayName: 'Sentinel Vault User'
+            name: 'Rakexura User',
+            displayName: 'Rakexura Vault User'
           },
           pubKeyCredParams: [
             { alg: -7, type: 'public-key' },
@@ -1076,7 +1076,7 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
             </div>
             
             <h1 className="lock-title">
-              {isInitialized ? 'SENTINEL VAULT' : 'CONFIGURE SENTINEL'}
+              {isInitialized ? 'RAKEXURA VAULT' : 'CONFIGURE RAKEXURA'}
             </h1>
             <p className="lock-subtitle">
               {isInitialized ? 'DEC_KEY_REQUIRED' : 'INITIAL_SETUP_REQUIRED'}
@@ -1147,7 +1147,7 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
                 <SentinelLogo size={36} />
               </div>
               <h1 className="brand-title">
-                SENTINEL<span>// VAULT</span>
+                RAKEXURA<span>// VAULT</span>
               </h1>
             </div>
 
