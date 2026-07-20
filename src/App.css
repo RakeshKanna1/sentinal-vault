@@ -537,7 +537,8 @@
 
 /* Interactive Card Design */
 .vault-card {
-  height: 240px;
+  min-height: 260px;
+  height: auto;
   position: relative;
   transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
@@ -1179,27 +1180,47 @@
     grid-template-columns: 1fr;
     gap: 16px;
     margin-bottom: 30px;
+    width: 100%;
   }
 
   .vault-card {
-    height: 390px;
+    height: auto;
+    min-height: 280px;
+    width: 100%;
   }
 
   .card-front, .card-back {
     padding: 18px;
     border-radius: 16px;
+    min-height: 280px;
+    height: 100%;
+    box-sizing: border-box;
+  }
+
+  .credential-field {
+    padding: 8px 12px;
+    font-size: 13px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .credential-value {
+    max-width: 100%;
+    word-break: break-all;
   }
 
   .card-platform-title {
     font-size: 16px;
+    word-break: break-word;
   }
 
   .card-username {
-    font-size: 13px;
+    font-size: 12px;
+    word-break: break-all;
   }
 
   .card-button-row {
-    gap: 8px;
+    gap: 6px;
   }
 
   .btn-card-action {
