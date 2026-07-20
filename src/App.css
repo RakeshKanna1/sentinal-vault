@@ -978,6 +978,10 @@
   z-index: 2000;
   box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 15px rgba(255,91,26,0.1);
   color: #fff;
+  font-size: 14px;
+  font-family: var(--font-mono);
+}
+
 /* Game Tag Badges */
 .game-tag-badge {
   background: rgba(0, 240, 255, 0.08);
@@ -1050,31 +1054,37 @@
   .vault-header {
     flex-direction: column;
     align-items: stretch;
-    gap: 14px;
-    padding: 14px 16px;
+    gap: 12px;
+    padding: 12px 16px;
+    overflow: hidden;
   }
 
   .brand-section {
-    justify-content: center;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
   }
 
   .brand-title {
-    font-size: 18px;
+    font-size: 15px;
+    white-space: nowrap;
+    letter-spacing: -0.5px;
   }
 
   .status-indicator-bar {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
     width: 100%;
   }
 
   .status-capsule {
+    flex: 1 1 auto;
     justify-content: center;
-    font-size: 10px;
-    padding: 8px 10px;
-    width: 100%;
-    border-radius: 10px;
+    font-size: 9px;
+    padding: 6px 8px;
+    border-radius: 8px;
     white-space: nowrap;
   }
 
@@ -1252,10 +1262,13 @@
   .notification-banner {
     left: 12px;
     right: 12px;
-    bottom: 16px;
-    padding: 12px 16px;
-    font-size: 12px;
+    top: 16px;
+    bottom: auto;
+    padding: 10px 14px;
+    font-size: 11px;
     border-radius: 10px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.7);
+    z-index: 9999;
   }
 }
 
