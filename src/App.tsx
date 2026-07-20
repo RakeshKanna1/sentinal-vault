@@ -543,7 +543,16 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
     }
   }, [isUnlocked, isInitialized, biometricsEnabled]);
 
-  const base64ToArrayBuffer = (base64: string): ArrayBuffer => {
+  const bufferToBase64 = (buffer: ArrayBuffer): string => {
+    const bytes = new Uint8Array(buffer);
+    let binary = '';
+    for (let i = 0; i < bytes.byteLength; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    return window.btoa(binary);
+  };
+
+  const base64ToBuffer = (base64: string): ArrayBuffer => {
     const binary = window.atob(base64);
     const bytes = new Uint8Array(binary.length);
     for (let i = 0; i < binary.length; i++) {
@@ -554,7 +563,7 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
 
   const handleEnableBiometrics = async () => {
     if (!masterPassword) {
-      triggerNotification('Unlock vault first to bind Fingerprint / Face ID.');
+      triggerNotification('Unlock vault first with Master Password to bind Fingerprint.');
       return;
     }
 
@@ -577,22 +586,27 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
           ],
           authenticatorSelection: {
             authenticatorAttachment: 'platform',
-            userVerification: 'required'
+            userVerification: 'preferred'
           },
           timeout: 60000
         }
       })) as PublicKeyCredential;
 
-      if (credential) {
-        const bioEncryptedMaster = await encryptText(masterPassword, credential.id);
-        localStorage.setItem('sentinel_biometric_credential', credential.id);
+      if (credential && credential.rawId) {
+        const rawIdB64 = bufferToBase64(credential.rawId);
+        const bioEncryptedMaster = await encryptText(masterPassword, rawIdB64);
+        localStorage.setItem('sentinel_biometric_credential', rawIdB64);
         localStorage.setItem('sentinel_biometric_payload', bioEncryptedMaster);
         setBiometricsEnabled(true);
-        triggerNotification('Fingerprint / Face ID Access Configured!');
+        triggerNotification('Fingerprint / Face ID Access Configured Successfully!');
       }
-    } catch (err) {
-      console.error(err);
-      triggerNotification('Biometric registration cancelled or unsupported.');
+    } catch (err: any) {
+      console.error('Biometric registration error:', err);
+      if (err.name === 'NotAllowedError') {
+        triggerNotification('Biometric registration cancelled.');
+      } else {
+        triggerNotification('Biometric registration unsupported or failed.');
+      }
     }
   };
 
@@ -605,37 +619,37 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
 
   const handleBiometricUnlock = async () => {
     try {
-      const credentialId = localStorage.getItem('sentinel_biometric_credential');
+      const rawIdB64 = localStorage.getItem('sentinel_biometric_credential');
       const bioPayload = localStorage.getItem('sentinel_biometric_payload');
-      if (!credentialId || !bioPayload) {
-        setErrorMsg('Fingerprint authentication not set up on this device.');
+      if (!rawIdB64 || !bioPayload) {
+        setErrorMsg('Unlock with Master Password first to configure Fingerprint access.');
         return;
       }
 
       const challenge = window.crypto.getRandomValues(new Uint8Array(32));
-      const rawId = base64ToArrayBuffer(credentialId);
+      const rawIdBuffer = base64ToBuffer(rawIdB64);
 
       const assertion = await navigator.credentials.get({
         publicKey: {
           challenge,
           allowCredentials: [
             {
-              id: rawId,
+              id: rawIdBuffer,
               type: 'public-key'
             }
           ],
-          userVerification: 'required',
+          userVerification: 'preferred',
           timeout: 60000
         }
       });
 
       if (assertion) {
-        const recoveredMaster = await decryptText(bioPayload, credentialId);
+        const recoveredMaster = await decryptText(bioPayload, rawIdB64);
         setMasterPassword(recoveredMaster);
 
         // Perform unlock
         const authVerifyToken = localStorage.getItem('sentinel_vault_auth_token');
-        if (!authVerifyToken) throw new Error('Missing token');
+        if (!authVerifyToken) throw new Error('Missing auth token');
 
         const verified = await decryptText(authVerifyToken, recoveredMaster);
         if (verified !== 'sentinel_vault_auth_verified') throw new Error('Verification failed');
@@ -648,9 +662,13 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
         setErrorMsg('');
         triggerNotification('Biometric Identity Verified. Vault Unlocked!');
       }
-    } catch (err) {
-      console.error(err);
-      setErrorMsg('Fingerprint / Face ID verification failed.');
+    } catch (err: any) {
+      console.error('Biometric unlock error:', err);
+      if (err.name === 'NotAllowedError') {
+        setErrorMsg('Biometric verification cancelled.');
+      } else {
+        setErrorMsg('Biometric verification failed. Please enter Master Password.');
+      }
     }
   };
 
