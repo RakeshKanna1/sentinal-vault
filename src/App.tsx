@@ -250,6 +250,7 @@ export default function App() {
   const [formUsername, setFormUsername] = useState('');
   const [formPassword, setFormPassword] = useState('');
   const [formNotes, setFormNotes] = useState('');
+  const [formGames, setFormGames] = useState('');
   const [formCategory, setFormCategory] = useState<'steam' | 'xbox' | 'nvidia' | 'custom'>('custom');
 
   // Password Generator States
@@ -890,13 +891,15 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
     try {
       const passEnc = await encryptText(formPassword, masterPassword);
       const notesEnc = await encryptText(formNotes || 'No notes saved.', masterPassword);
-      
+      const gamesParsed = formGames ? formGames.split(',').map(g => g.trim()).filter(Boolean) : undefined;
+
       const newItem: CredentialItem = {
         id: Date.now().toString(),
         platform: formPlatform,
         username: formUsername,
         passwordEncrypted: passEnc,
         notesEncrypted: notesEnc,
+        gamesList: gamesParsed,
         category: formCategory,
         strength: checkPasswordStrength(formPassword),
         updatedAt: new Date().toLocaleDateString()
@@ -911,6 +914,7 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
       setFormUsername('');
       setFormPassword('');
       setFormNotes('');
+      setFormGames('');
       setFormCategory('custom');
       setShowAddModal(false);
       triggerNotification('Gamer Key Saved.');
@@ -925,7 +929,8 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
     setFormPlatform(item.platform);
     setFormUsername(item.username);
     setFormCategory(item.category);
-    
+    setFormGames(item.gamesList ? item.gamesList.join(', ') : '');
+
     // Decrypt fields first
     try {
       const pass = await decryptText(item.passwordEncrypted, masterPassword);
@@ -946,6 +951,7 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
     try {
       const passEnc = await encryptText(formPassword, masterPassword);
       const notesEnc = await encryptText(formNotes, masterPassword);
+      const gamesParsed = formGames ? formGames.split(',').map(g => g.trim()).filter(Boolean) : undefined;
 
       const updatedList = vaultItems.map((item) => {
         if (item.id === editingItem.id) {
@@ -955,6 +961,7 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
             username: formUsername,
             passwordEncrypted: passEnc,
             notesEncrypted: notesEnc,
+            gamesList: gamesParsed,
             category: formCategory,
             strength: checkPasswordStrength(formPassword),
             updatedAt: new Date().toLocaleDateString()
@@ -976,6 +983,7 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
       setFormUsername('');
       setFormPassword('');
       setFormNotes('');
+      setFormGames('');
       setShowEditModal(false);
       triggerNotification('Gamer Key Updated.');
     } catch (err) {
@@ -1749,6 +1757,17 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
                 </div>
 
                 <div className="form-group">
+                  <label className="form-label">Games Included in this Account (comma-separated)</label>
+                  <input 
+                    type="text" 
+                    placeholder="e.g. GTA V, Red Dead Redemption 2, Hitman 3" 
+                    className="form-input"
+                    value={formGames}
+                    onChange={(e) => setFormGames(e.target.value)}
+                  />
+                </div>
+
+                <div className="form-group">
                   <label className="form-label">Security Notes / Answers / Recovery Codes</label>
                   <textarea 
                     placeholder="Enter backup security answers or notes" 
@@ -1847,6 +1866,17 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
                       <RefreshCw size={14} />
                     </button>
                   </div>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Games Included in this Account (comma-separated)</label>
+                  <input 
+                    type="text" 
+                    placeholder="e.g. GTA V, Red Dead Redemption 2, Hitman 3" 
+                    className="form-input"
+                    value={formGames}
+                    onChange={(e) => setFormGames(e.target.value)}
+                  />
                 </div>
 
                 <div className="form-group">
