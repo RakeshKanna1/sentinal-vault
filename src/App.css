@@ -165,6 +165,38 @@
   font-family: var(--font-mono);
 }
 
+.btn-biometric {
+  margin-top: 14px;
+  width: 100%;
+  padding: 14px 20px;
+  background: rgba(0, 240, 255, 0.08);
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  color: #00f0ff;
+  border-radius: 10px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.12);
+  letter-spacing: 0.5px;
+}
+
+.btn-biometric:hover {
+  background: rgba(0, 240, 255, 0.2);
+  border-color: #00f0ff;
+  box-shadow: 0 0 25px rgba(0, 240, 255, 0.35);
+  transform: translateY(-2px);
+}
+
+.btn-biometric:active {
+  transform: translateY(0);
+}
+
 /* Header Panel */
 .vault-header {
   display: flex;

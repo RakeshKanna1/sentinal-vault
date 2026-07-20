@@ -3,7 +3,7 @@ import {
   Lock, Key, Eye, EyeOff, Copy, Plus, Search, 
   Trash2, Edit3, RefreshCw, 
   Download, Upload, X, Check, ShieldAlert, Gamepad2, Laptop,
-  FileText
+  FileText, Fingerprint
 } from 'lucide-react';
 import { encryptText, decryptText } from './utils/crypto';
 import { generatePasswordsFromGame } from './utils/gamePasswordGenerator';
@@ -511,6 +511,132 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
     triggerNotification('Applied password to vault registry form.');
   };
 
+  // Biometrics WebAuthn States & Methods
+  const [biometricsAvailable, setBiometricsAvailable] = useState(false);
+  const [biometricsEnabled, setBiometricsEnabled] = useState(false);
+
+  useEffect(() => {
+    if (window.PublicKeyCredential && PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable) {
+      PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()
+        .then((available) => {
+          setBiometricsAvailable(available);
+          const bioCred = localStorage.getItem('sentinel_biometric_credential');
+          if (bioCred) setBiometricsEnabled(true);
+        })
+        .catch(() => setBiometricsAvailable(false));
+    }
+  }, []);
+
+  const base64ToArrayBuffer = (base64: string): ArrayBuffer => {
+    const binary = window.atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    return bytes.buffer;
+  };
+
+  const handleEnableBiometrics = async () => {
+    if (!masterPassword) {
+      triggerNotification('Unlock vault first to bind Fingerprint / Face ID.');
+      return;
+    }
+
+    try {
+      const challenge = window.crypto.getRandomValues(new Uint8Array(32));
+      const userId = window.crypto.getRandomValues(new Uint8Array(16));
+
+      const credential = (await navigator.credentials.create({
+        publicKey: {
+          challenge,
+          rp: { name: 'Sentinel Vault' },
+          user: {
+            id: userId,
+            name: 'Sentinel User',
+            displayName: 'Sentinel Vault User'
+          },
+          pubKeyCredParams: [
+            { alg: -7, type: 'public-key' },
+            { alg: -257, type: 'public-key' }
+          ],
+          authenticatorSelection: {
+            authenticatorAttachment: 'platform',
+            userVerification: 'required'
+          },
+          timeout: 60000
+        }
+      })) as PublicKeyCredential;
+
+      if (credential) {
+        const bioEncryptedMaster = await encryptText(masterPassword, credential.id);
+        localStorage.setItem('sentinel_biometric_credential', credential.id);
+        localStorage.setItem('sentinel_biometric_payload', bioEncryptedMaster);
+        setBiometricsEnabled(true);
+        triggerNotification('Fingerprint / Face ID Access Configured!');
+      }
+    } catch (err) {
+      console.error(err);
+      triggerNotification('Biometric registration cancelled or unsupported.');
+    }
+  };
+
+  const handleDisableBiometrics = () => {
+    localStorage.removeItem('sentinel_biometric_credential');
+    localStorage.removeItem('sentinel_biometric_payload');
+    setBiometricsEnabled(false);
+    triggerNotification('Biometric login disabled.');
+  };
+
+  const handleBiometricUnlock = async () => {
+    try {
+      const credentialId = localStorage.getItem('sentinel_biometric_credential');
+      const bioPayload = localStorage.getItem('sentinel_biometric_payload');
+      if (!credentialId || !bioPayload) {
+        setErrorMsg('Fingerprint authentication not set up on this device.');
+        return;
+      }
+
+      const challenge = window.crypto.getRandomValues(new Uint8Array(32));
+      const rawId = base64ToArrayBuffer(credentialId);
+
+      const assertion = await navigator.credentials.get({
+        publicKey: {
+          challenge,
+          allowCredentials: [
+            {
+              id: rawId,
+              type: 'public-key'
+            }
+          ],
+          userVerification: 'required',
+          timeout: 60000
+        }
+      });
+
+      if (assertion) {
+        const recoveredMaster = await decryptText(bioPayload, credentialId);
+        setMasterPassword(recoveredMaster);
+
+        // Perform unlock
+        const authVerifyToken = localStorage.getItem('sentinel_vault_auth_token');
+        if (!authVerifyToken) throw new Error('Missing token');
+
+        const verified = await decryptText(authVerifyToken, recoveredMaster);
+        if (verified !== 'sentinel_vault_auth_verified') throw new Error('Verification failed');
+
+        const savedItems = localStorage.getItem('sentinel_vault_items');
+        let currentList: CredentialItem[] = savedItems ? JSON.parse(savedItems) : [];
+
+        setVaultItems(currentList);
+        setIsUnlocked(true);
+        setErrorMsg('');
+        triggerNotification('Biometric Identity Verified. Vault Unlocked!');
+      }
+    } catch (err) {
+      console.error(err);
+      setErrorMsg('Fingerprint / Face ID verification failed.');
+    }
+  };
 
   // Initialize vault with defaults on master password setup
   const handleInitializeVault = async () => {
@@ -955,6 +1081,17 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
               <HoverScrambleText text={isInitialized ? 'DECRYPT VAULT' : 'CREATE VAULT'} />
             </button>
 
+            {isInitialized && biometricsAvailable && (
+              <button 
+                className="btn-biometric interactive"
+                onClick={biometricsEnabled ? handleBiometricUnlock : handleEnableBiometrics}
+                title={biometricsEnabled ? 'Scan Fingerprint or Face ID to unlock' : 'Click to enable Fingerprint / Face ID for this device'}
+              >
+                <Fingerprint size={20} />
+                <span>{biometricsEnabled ? 'UNLOCK WITH FINGERPRINT / FACE ID' : 'ENABLE FINGERPRINT ACCESS'}</span>
+              </button>
+            )}
+
             {errorMsg && <div className="lock-error">{errorMsg}</div>}
           </div>
         </div>
@@ -975,6 +1112,22 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
             </div>
 
             <div className="status-indicator-bar">
+              <button 
+                className="status-capsule interactive"
+                onClick={biometricsEnabled ? handleDisableBiometrics : handleEnableBiometrics}
+                style={{ 
+                  cursor: 'pointer', 
+                  background: biometricsEnabled ? 'rgba(0, 240, 255, 0.15)' : 'rgba(255, 255, 255, 0.04)', 
+                  borderColor: biometricsEnabled ? '#00f0ff' : 'var(--border-dim)' 
+                }}
+                title={biometricsEnabled ? 'Click to disable biometric login' : 'Click to enable Fingerprint / Face ID for this device'}
+              >
+                <Fingerprint size={14} style={{ color: biometricsEnabled ? '#00f0ff' : '#aaa', marginRight: '6px' }} />
+                <span style={{ color: biometricsEnabled ? '#00f0ff' : 'inherit' }}>
+                  {biometricsEnabled ? 'FINGERPRINT_ACTIVE' : 'ENABLE_FINGERPRINT'}
+                </span>
+              </button>
+
               <div className="status-capsule">
                 <div className="pulse-dot"></div>
                 <span>DECRYPTED_SESSION</span>
