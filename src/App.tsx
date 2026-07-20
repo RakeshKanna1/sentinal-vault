@@ -622,7 +622,7 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
       const rawIdB64 = localStorage.getItem('sentinel_biometric_credential');
       const bioPayload = localStorage.getItem('sentinel_biometric_payload');
       if (!rawIdB64 || !bioPayload) {
-        setErrorMsg('Unlock with Master Password first to configure Fingerprint access.');
+        setBiometricsEnabled(false);
         return;
       }
 
@@ -664,10 +664,15 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
       }
     } catch (err: any) {
       console.error('Biometric unlock error:', err);
+      // Clean up stale or domain-mismatched credential so user can log in cleanly
+      localStorage.removeItem('sentinel_biometric_credential');
+      localStorage.removeItem('sentinel_biometric_payload');
+      setBiometricsEnabled(false);
+
       if (err.name === 'NotAllowedError') {
         setErrorMsg('Biometric verification cancelled.');
       } else {
-        setErrorMsg('Biometric verification failed. Please enter Master Password.');
+        setErrorMsg('Biometric key expired or changed. Unlock with Master Password to re-bind.');
       }
     }
   };
