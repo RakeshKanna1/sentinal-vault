@@ -528,7 +528,7 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
       const authVerifyToken = await encryptText('sentinel_vault_auth_verified', masterPassword);
       localStorage.setItem('sentinel_vault_auth_token', authVerifyToken);
 
-      // Create defaults from user text file
+      // Create defaults from user text file (All 10 gamer-vault items)
       const defaultItemsRaw = [
         { id: '1', platform: 'RAKEJINWO', username: 'jinwosung2', password: 'Rakesh@111', notes: 'Imported launcher credential.', category: 'custom' },
         { id: '2', platform: 'RAKEGENERAL', username: 'rake_general', password: 'Rakesh@111', notes: 'General gaming account credential.', category: 'custom' },
@@ -536,7 +536,10 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
         { id: '4', platform: 'EPIC GAMES', username: 'cheappcgamesrake@gmail.com', password: 'Rakesh@114', notes: 'Epic Games Store official email login.', category: 'custom' },
         { id: '5', platform: 'RAKEXURA CRIC', username: 'Rakexura_cric', password: 'rakexura@112', notes: 'Cricket / sports gaming portal.', category: 'custom' },
         { id: '6', platform: 'RAKEXURA MAFIA AND HITMAN', username: 'rake_hitman', password: 'Rakesh@111', notes: 'Steam launcher keys for Mafia and Hitman collections.', category: 'steam' },
-        { id: '7', platform: 'RAKEXURA FH6', username: 'rakexura_fh6', password: 'rakexura@111', notes: 'Xbox Live / Forza Horizon account.', category: 'xbox' }
+        { id: '7', platform: 'RAKEXURA FH6', username: 'rakexura_fh6', password: 'rakexura@111', notes: 'Xbox Live / Forza Horizon account.', category: 'xbox' },
+        { id: '8', platform: 'Nvidia Geforce Now', username: '12k21rakeshkannam@gmail.com', password: 'Rakesh@111', notes: 'Nvidia GeForce NOW Cloud Gaming account.', category: 'nvidia' },
+        { id: '9', platform: 'Steam - Rake_Meccha', username: 'Rake_Meccha', password: 'Rakesh@111', notes: 'Steam library and launcher credentials.', category: 'steam' },
+        { id: '10', platform: 'Xbox Live', username: '12k21rakeshkannam@gmail.com', password: 'Rakesh@111', notes: 'Xbox Pass and Microsoft Store gaming account.', category: 'xbox' }
       ];
 
       const encryptedItems: CredentialItem[] = [];
@@ -590,13 +593,43 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
 
       // Load items
       const savedItems = localStorage.getItem('sentinel_vault_items');
-      if (savedItems) {
-        setVaultItems(JSON.parse(savedItems));
+      let currentList: CredentialItem[] = savedItems ? JSON.parse(savedItems) : [];
+
+      // Auto-sync missing default items (items 8, 9, 10)
+      const missingDefaults = [
+        { id: '8', platform: 'Nvidia Geforce Now', username: '12k21rakeshkannam@gmail.com', password: 'Rakesh@111', notes: 'Nvidia GeForce NOW Cloud Gaming account.', category: 'nvidia' },
+        { id: '9', platform: 'Steam - Rake_Meccha', username: 'Rake_Meccha', password: 'Rakesh@111', notes: 'Steam library and launcher credentials.', category: 'steam' },
+        { id: '10', platform: 'Xbox Live', username: '12k21rakeshkannam@gmail.com', password: 'Rakesh@111', notes: 'Xbox Pass and Microsoft Store gaming account.', category: 'xbox' }
+      ];
+
+      let updateNeeded = false;
+      for (const mItem of missingDefaults) {
+        if (!currentList.some(item => item.id === mItem.id || item.platform === mItem.platform)) {
+          const passEnc = await encryptText(mItem.password, masterPassword);
+          const notesEnc = await encryptText(mItem.notes, masterPassword);
+          currentList.push({
+            id: mItem.id,
+            platform: mItem.platform,
+            username: mItem.username,
+            passwordEncrypted: passEnc,
+            notesEncrypted: notesEnc,
+            category: mItem.category as any,
+            strength: checkPasswordStrength(mItem.password),
+            updatedAt: new Date().toLocaleDateString()
+          });
+          updateNeeded = true;
+        }
       }
+
+      if (updateNeeded) {
+        localStorage.setItem('sentinel_vault_items', JSON.stringify(currentList));
+      }
+
+      setVaultItems(currentList);
 
       setIsUnlocked(true);
       setErrorMsg('');
-      triggerNotification('Decryption Key Accepted. Access Granted.');
+      triggerNotification(updateNeeded ? 'Decryption Key Accepted. Vault items synced to 10 keys!' : 'Decryption Key Accepted. Access Granted.');
     } catch (err) {
       setErrorMsg('Invalid Decryption Key. Try again.');
       console.error(err);
