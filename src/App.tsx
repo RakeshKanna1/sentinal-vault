@@ -527,6 +527,22 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
     }
   }, []);
 
+  // Auto-prompt Fingerprint / Face ID scanner immediately on login screen load
+  const hasAutoPromptedBio = useRef(false);
+
+  useEffect(() => {
+    if (!isUnlocked && isInitialized && biometricsEnabled && !hasAutoPromptedBio.current) {
+      hasAutoPromptedBio.current = true;
+      const timer = setTimeout(() => {
+        handleBiometricUnlock();
+      }, 400);
+      return () => clearTimeout(timer);
+    }
+    if (isUnlocked) {
+      hasAutoPromptedBio.current = false;
+    }
+  }, [isUnlocked, isInitialized, biometricsEnabled]);
+
   const base64ToArrayBuffer = (base64: string): ArrayBuffer => {
     const binary = window.atob(base64);
     const bytes = new Uint8Array(binary.length);

@@ -981,30 +981,244 @@
   font-family: var(--font-mono);
 }
 
-/* Responsive Overrides */
+/* Premium Mobile-First Layout Overrides */
 @media (max-width: 768px) {
+  /* Lock Screen Mobile Layout */
+  .lock-screen {
+    padding: 16px;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .lock-box {
+    padding: 28px 18px;
+    border-radius: 20px;
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .lock-title {
+    font-size: 22px;
+    letter-spacing: -0.5px;
+  }
+
+  .lock-subtitle {
+    font-size: 12px;
+    margin-bottom: 24px;
+  }
+
+  .lock-input {
+    padding: 14px 16px;
+    font-size: 15px;
+    letter-spacing: 2px;
+    border-radius: 10px;
+  }
+
+  .btn-decrypt {
+    padding: 14px;
+    font-size: 14px;
+    border-radius: 10px;
+    min-height: 48px;
+  }
+
+  .btn-biometric {
+    margin-top: 12px;
+    padding: 14px 16px;
+    font-size: 13px;
+    border-radius: 10px;
+    min-height: 48px;
+  }
+
+  /* Header Layout on Mobile */
   .vault-header {
-    padding: 16px 20px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+    padding: 14px 16px;
   }
+
+  .brand-section {
+    justify-content: center;
+  }
+
+  .brand-title {
+    font-size: 18px;
+  }
+
+  .status-indicator-bar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .status-capsule {
+    justify-content: center;
+    font-size: 10px;
+    padding: 8px 10px;
+    width: 100%;
+    border-radius: 10px;
+    white-space: nowrap;
+  }
+
+  .btn-lock {
+    grid-column: span 2;
+    justify-content: center;
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
+    font-size: 12px;
+  }
+
+  /* Main Vault Padding */
   .vault-main {
-    padding: 20px;
+    padding: 16px;
   }
+
+  /* Mobile Stats Rack Grid */
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+
+  .stat-card {
+    padding: 14px 12px;
+    border-radius: 12px;
+  }
+
+  .stat-label {
+    font-size: 10px;
+    letter-spacing: 0.5px;
+  }
+
+  .stat-value {
+    font-size: 22px;
+    margin-top: 4px;
+  }
+
+  /* Control Hub & Touch Rails */
   .hub-top {
     flex-direction: column;
     align-items: stretch;
+    gap: 12px;
+    margin-bottom: 16px;
   }
+
   .search-wrapper {
     max-width: 100%;
-  }
-  .hub-actions {
     width: 100%;
-    justify-content: flex-start;
   }
+
+  .search-input {
+    padding: 14px 16px 14px 44px;
+    font-size: 13px;
+    border-radius: 10px;
+  }
+
+  .hub-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .btn-primary {
+    grid-column: span 2;
+    justify-content: center;
+    padding: 14px;
+    font-size: 13px;
+    border-radius: 10px;
+    min-height: 48px;
+  }
+
+  .btn-secondary {
+    justify-content: center;
+    padding: 12px;
+    font-size: 12px;
+    border-radius: 10px;
+    min-height: 44px;
+  }
+
+  .category-rail {
+    display: flex;
+    overflow-x: auto;
+    white-space: nowrap;
+    gap: 8px;
+    padding-bottom: 6px;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+  }
+
+  .category-tab {
+    flex: 0 0 auto;
+    padding: 8px 14px;
+    font-size: 11px;
+    border-radius: 8px;
+    scroll-snap-align: start;
+  }
+
+  /* Vault Cards Mobile Grid */
   .cards-grid {
     grid-template-columns: 1fr;
+    gap: 16px;
+    margin-bottom: 30px;
   }
+
+  .vault-card {
+    height: 390px;
+  }
+
+  .card-front, .card-back {
+    padding: 18px;
+    border-radius: 16px;
+  }
+
+  .card-platform-title {
+    font-size: 16px;
+  }
+
+  .card-username {
+    font-size: 13px;
+  }
+
+  .card-button-row {
+    gap: 8px;
+  }
+
+  .btn-card-action {
+    padding: 10px;
+    font-size: 11px;
+    min-height: 42px;
+  }
+
+  /* Modals on Mobile */
+  .modal-overlay {
+    padding: 12px;
+    align-items: flex-end;
+  }
+
+  .modal-content {
+    width: 100%;
+    max-height: 85vh;
+    padding: 20px;
+    border-radius: 20px 20px 0 0;
+    overflow-y: auto;
+  }
+
   .form-row-split {
     grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  /* Notification Banner on Mobile */
+  .notification-banner {
+    left: 12px;
+    right: 12px;
+    bottom: 16px;
+    padding: 12px 16px;
+    font-size: 12px;
+    border-radius: 10px;
   }
 }
 
