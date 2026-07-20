@@ -18,6 +18,7 @@ interface CredentialItem {
   username: string;
   passwordEncrypted: string;
   notesEncrypted: string;
+  gamesList?: string[];
   category: 'steam' | 'xbox' | 'nvidia' | 'custom';
   strength: 'weak' | 'medium' | 'strong';
   updatedAt: string;
@@ -694,18 +695,18 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
       const authVerifyToken = await encryptText('sentinel_vault_auth_verified', masterPassword);
       localStorage.setItem('sentinel_vault_auth_token', authVerifyToken);
 
-      // Create defaults from user text file (All 10 gamer-vault items)
+      // Create defaults from user text file (All 10 gamer-vault items with games)
       const defaultItemsRaw = [
-        { id: '1', platform: 'RAKEJINWO', username: 'jinwosung2', password: 'Rakesh@111', notes: 'Imported launcher credential.', category: 'custom' },
-        { id: '2', platform: 'RAKEGENERAL', username: 'rake_general', password: 'Rakesh@111', notes: 'General gaming account credential.', category: 'custom' },
-        { id: '3', platform: 'ROCKSTAR - STEAM', username: 'Rake_Rockstar', password: 'Rakesh@111', notes: 'Rockstar Games Social Club / Steam integration.', category: 'steam' },
-        { id: '4', platform: 'EPIC GAMES', username: 'cheappcgamesrake@gmail.com', password: 'Rakesh@114', notes: 'Epic Games Store official email login.', category: 'custom' },
-        { id: '5', platform: 'RAKEXURA CRIC', username: 'Rakexura_cric', password: 'rakexura@112', notes: 'Cricket / sports gaming portal.', category: 'custom' },
-        { id: '6', platform: 'RAKEXURA MAFIA AND HITMAN', username: 'rake_hitman', password: 'Rakesh@111', notes: 'Steam launcher keys for Mafia and Hitman collections.', category: 'steam' },
-        { id: '7', platform: 'RAKEXURA FH6', username: 'rakexura_fh6', password: 'rakexura@111', notes: 'Xbox Live / Forza Horizon account.', category: 'xbox' },
-        { id: '8', platform: 'Nvidia Geforce Now', username: '12k21rakeshkannam@gmail.com', password: 'Rakesh@111', notes: 'Nvidia GeForce NOW Cloud Gaming account.', category: 'nvidia' },
-        { id: '9', platform: 'Steam - Rake_Meccha', username: 'Rake_Meccha', password: 'Rakesh@111', notes: 'Steam library and launcher credentials.', category: 'steam' },
-        { id: '10', platform: 'Xbox Live', username: '12k21rakeshkannam@gmail.com', password: 'Rakesh@111', notes: 'Xbox Pass and Microsoft Store gaming account.', category: 'xbox' }
+        { id: '1', platform: 'RAKEJINWO', username: 'jinwosung2', password: 'Rakesh@111', notes: 'Imported launcher credential.', gamesList: ['Solo Leveling Arise', 'RPG Launchers'], category: 'custom' },
+        { id: '2', platform: 'RAKEGENERAL', username: 'rake_general', password: 'Rakesh@111', notes: 'General gaming account credential.', gamesList: ['General PC Games', 'Indie Vault'], category: 'custom' },
+        { id: '3', platform: 'ROCKSTAR - STEAM', username: 'Rake_Rockstar', password: 'Rakesh@111', notes: 'Rockstar Games Social Club / Steam integration.', gamesList: ['GTA V', 'Red Dead Redemption 2', 'Max Payne 3'], category: 'steam' },
+        { id: '4', platform: 'EPIC GAMES', username: 'cheappcgamesrake@gmail.com', password: 'Rakesh@114', notes: 'Epic Games Store official email login.', gamesList: ['Fortnite', 'Epic Games Store Library'], category: 'custom' },
+        { id: '5', platform: 'RAKEXURA CRIC', username: 'Rakexura_cric', password: 'rakexura@112', notes: 'Cricket / sports gaming portal.', gamesList: ['Cricket 24', 'EA Sports Cricket'], category: 'custom' },
+        { id: '6', platform: 'RAKEXURA MAFIA AND HITMAN', username: 'rake_hitman', password: 'Rakesh@111', notes: 'Steam launcher keys for Mafia and Hitman collections.', gamesList: ['Hitman 3', 'Hitman World of Assassination', 'Mafia Definitive Edition', 'Mafia II', 'Mafia III'], category: 'steam' },
+        { id: '7', platform: 'RAKEXURA FH6', username: 'rakexura_fh6', password: 'rakexura@111', notes: 'Xbox Live / Forza Horizon account.', gamesList: ['Forza Horizon 5', 'Forza Horizon 4', 'Xbox Live'], category: 'xbox' },
+        { id: '8', platform: 'Nvidia Geforce Now', username: '12k21rakeshkannam@gmail.com', password: 'Rakesh@111', notes: 'Nvidia GeForce NOW Cloud Gaming account.', gamesList: ['GeForce NOW Cloud Portal'], category: 'nvidia' },
+        { id: '9', platform: 'Steam - Rake_Meccha', username: 'Rake_Meccha', password: 'Rakesh@111', notes: 'Steam library and launcher credentials.', gamesList: ['Cyberpunk 2077', 'The Witcher 3', 'Steam Main Library'], category: 'steam' },
+        { id: '10', platform: 'Xbox Live', username: '12k21rakeshkannam@gmail.com', password: 'Rakesh@111', notes: 'Xbox Pass and Microsoft Store gaming account.', gamesList: ['Halo Infinite', 'Minecraft', 'Gears 5', 'Xbox Game Pass'], category: 'xbox' }
       ];
 
       const encryptedItems: CredentialItem[] = [];
@@ -718,6 +719,7 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
           username: item.username,
           passwordEncrypted: passEnc,
           notesEncrypted: notesEnc,
+          gamesList: item.gamesList,
           category: item.category as any,
           strength: checkPasswordStrength(item.password),
           updatedAt: new Date().toLocaleDateString()
@@ -763,9 +765,9 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
 
       // Auto-sync missing default items (items 8, 9, 10)
       const missingDefaults = [
-        { id: '8', platform: 'Nvidia Geforce Now', username: '12k21rakeshkannam@gmail.com', password: 'Rakesh@111', notes: 'Nvidia GeForce NOW Cloud Gaming account.', category: 'nvidia' },
-        { id: '9', platform: 'Steam - Rake_Meccha', username: 'Rake_Meccha', password: 'Rakesh@111', notes: 'Steam library and launcher credentials.', category: 'steam' },
-        { id: '10', platform: 'Xbox Live', username: '12k21rakeshkannam@gmail.com', password: 'Rakesh@111', notes: 'Xbox Pass and Microsoft Store gaming account.', category: 'xbox' }
+        { id: '8', platform: 'Nvidia Geforce Now', username: '12k21rakeshkannam@gmail.com', password: 'Rakesh@111', notes: 'Nvidia GeForce NOW Cloud Gaming account.', gamesList: ['GeForce NOW Cloud Portal'], category: 'nvidia' },
+        { id: '9', platform: 'Steam - Rake_Meccha', username: 'Rake_Meccha', password: 'Rakesh@111', notes: 'Steam library and launcher credentials.', gamesList: ['Cyberpunk 2077', 'The Witcher 3', 'Steam Main Library'], category: 'steam' },
+        { id: '10', platform: 'Xbox Live', username: '12k21rakeshkannam@gmail.com', password: 'Rakesh@111', notes: 'Xbox Pass and Microsoft Store gaming account.', gamesList: ['Halo Infinite', 'Minecraft', 'Gears 5', 'Xbox Game Pass'], category: 'xbox' }
       ];
 
       let updateNeeded = false;
@@ -779,6 +781,7 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
             username: mItem.username,
             passwordEncrypted: passEnc,
             notesEncrypted: notesEnc,
+            gamesList: mItem.gamesList,
             category: mItem.category as any,
             strength: checkPasswordStrength(mItem.password),
             updatedAt: new Date().toLocaleDateString()
@@ -786,6 +789,30 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
           updateNeeded = true;
         }
       }
+
+      // Attach default gamesList to existing items if missing
+      const defaultGamesMap: Record<string, string[]> = {
+        '1': ['Solo Leveling Arise', 'RPG Launchers'],
+        '2': ['General PC Games', 'Indie Vault'],
+        '3': ['GTA V', 'Red Dead Redemption 2', 'Max Payne 3'],
+        '4': ['Fortnite', 'Epic Games Store Library'],
+        '5': ['Cricket 24', 'EA Sports Cricket'],
+        '6': ['Hitman 3', 'Hitman World of Assassination', 'Mafia Definitive Edition', 'Mafia II', 'Mafia III'],
+        '7': ['Forza Horizon 5', 'Forza Horizon 4', 'Xbox Live'],
+        '8': ['GeForce NOW Cloud Portal'],
+        '9': ['Cyberpunk 2077', 'The Witcher 3', 'Steam Main Library'],
+        '10': ['Halo Infinite', 'Minecraft', 'Gears 5', 'Xbox Game Pass']
+      };
+
+      currentList = currentList.map(item => {
+        if (!item.gamesList || item.gamesList.length === 0) {
+          if (defaultGamesMap[item.id]) {
+            updateNeeded = true;
+            return { ...item, gamesList: defaultGamesMap[item.id] };
+          }
+        }
+        return item;
+      });
 
       if (updateNeeded) {
         localStorage.setItem('sentinel_vault_items', JSON.stringify(currentList));
@@ -1033,12 +1060,15 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
     fileReader.readAsText(file);
   };
 
-  // Filter items based on activeTab & searchQuery
+  // Filter items based on activeTab & searchQuery (Matches platform, username & games!)
   const filteredItems = vaultItems.filter((item) => {
     const matchesTab = activeTab === 'all' || item.category === activeTab;
+    const query = searchQuery.toLowerCase();
+    const gamesString = item.gamesList ? item.gamesList.join(' ').toLowerCase() : '';
     const matchesSearch = 
-      item.platform.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.username.toLowerCase().includes(searchQuery.toLowerCase());
+      item.platform.toLowerCase().includes(query) ||
+      item.username.toLowerCase().includes(query) ||
+      gamesString.includes(query);
     return matchesTab && matchesSearch;
   });
 
@@ -1554,6 +1584,16 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
                           </div>
 
                           <div className="card-center">
+                            {item.gamesList && item.gamesList.length > 0 && (
+                              <div className="card-games-container" style={{ margin: '8px 0 12px 0', display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
+                                {item.gamesList.map((game, idx) => (
+                                  <span key={idx} className="game-tag-badge">
+                                    🎮 {game}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+
                             <div className="credential-field">
                               <span className={`credential-value ${!isRevealed ? 'hidden-pass' : ''}`}>
                                 <ScrambledText text={decryptedPass} reveal={isRevealed} />

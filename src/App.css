@@ -977,8 +977,24 @@
   z-index: 2000;
   box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 15px rgba(255,91,26,0.1);
   color: #fff;
-  font-size: 14px;
+/* Game Tag Badges */
+.game-tag-badge {
+  background: rgba(0, 240, 255, 0.08);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  color: #00f0ff;
   font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.3px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.game-tag-badge:hover {
+  background: rgba(0, 240, 255, 0.18);
+  border-color: #00f0ff;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
 }
 
 /* Premium Mobile-First Layout Overrides */
