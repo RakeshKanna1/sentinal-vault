@@ -828,7 +828,7 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
             try {
               decrypted = await decryptText(rawPass, masterPassword);
             } catch (e) {
-              decrypted = rawPass;
+              decrypted = '';
             }
           }
           if (decrypted) {
@@ -883,10 +883,12 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
   const decryptItem = async (itemId: string, cipherText: string, type: 'password' | 'notes') => {
     try {
       let decrypted = cipherText;
-      try {
-        decrypted = await decryptText(cipherText, masterPassword);
-      } catch (e) {
-        decrypted = cipherText;
+      if (cipherText && cipherText.includes(':') && cipherText.includes('==')) {
+        try {
+          decrypted = await decryptText(cipherText, masterPassword);
+        } catch (e) {
+          decrypted = '';
+        }
       }
       if (type === 'password') {
         setDecryptedPasswords(prev => ({ ...prev, [itemId]: decrypted }));
@@ -1004,16 +1006,20 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
     let pass = item.passwordEncrypted;
     let notes = item.notesEncrypted;
 
-    try {
-      pass = await decryptText(item.passwordEncrypted, masterPassword);
-    } catch (err) {
-      pass = item.passwordEncrypted;
+    if (item.passwordEncrypted.includes(':') && item.passwordEncrypted.includes('==')) {
+      try {
+        pass = await decryptText(item.passwordEncrypted, masterPassword);
+      } catch (err) {
+        pass = '';
+      }
     }
 
-    try {
-      notes = await decryptText(item.notesEncrypted, masterPassword);
-    } catch (err) {
-      notes = item.notesEncrypted;
+    if (item.notesEncrypted.includes(':') && item.notesEncrypted.includes('==')) {
+      try {
+        notes = await decryptText(item.notesEncrypted, masterPassword);
+      } catch (err) {
+        notes = item.notesEncrypted.startsWith('{') ? '' : item.notesEncrypted;
+      }
     }
 
     setFormPassword(pass);
