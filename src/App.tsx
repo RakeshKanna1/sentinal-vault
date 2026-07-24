@@ -856,55 +856,43 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
     try {
       const { data } = await supabase.from('sentinel_vault').select('*').order('updated_at', { ascending: false });
       if (data && data.length > 0) {
-        const supabaseMapped: CredentialItem[] = data.map((item: any) => ({
-          id: String(item.id),
-          platform: item.platform,
-          username: item.username,
-          passwordEncrypted: item.password || '',
-          notesEncrypted: item.notes || '',
-          category: (item.category as any) || 'custom',
-          strength: checkPasswordStrength(item.password || ''),
-          updatedAt: item.updated_at ? new Date(item.updated_at).toLocaleDateString() : new Date().toLocaleDateString(),
-          gamesList: getGamesForPlatform(item.platform, item.games_included)
-        }));
+        const dedupMap = new Map<string, CredentialItem>();
 
-        setVaultItems((prev) => {
-          const map = new Map<string, CredentialItem>();
-
-          prev.forEach(item => {
-            const key = item.platform.trim().toLowerCase();
-            if (!map.has(key)) {
-              map.set(key, item);
-            }
-          });
-
-          supabaseMapped.forEach(item => {
-            const key = item.platform.trim().toLowerCase();
-            const existing = map.get(key);
-            const gamesList = (item.gamesList && item.gamesList.length > 0) ? item.gamesList : (existing?.gamesList || getGamesForPlatform(item.platform));
-            map.set(key, { ...item, gamesList });
-          });
-
-          return Array.from(map.values());
+        data.forEach((item: any) => {
+          const key = item.platform.trim().toLowerCase();
+          if (!dedupMap.has(key)) {
+            dedupMap.set(key, {
+              id: String(item.id),
+              platform: item.platform,
+              username: item.username,
+              passwordEncrypted: item.password || '',
+              notesEncrypted: item.notes || '',
+              category: (item.category as any) || 'custom',
+              strength: checkPasswordStrength(item.password || ''),
+              updatedAt: item.updated_at ? new Date(item.updated_at).toLocaleDateString() : new Date().toLocaleDateString(),
+              gamesList: getGamesForPlatform(item.platform, item.games_included)
+            });
+          }
         });
 
+        const cleanList = Array.from(dedupMap.values());
+        setVaultItems(cleanList);
+        localStorage.setItem('sentinel_vault_items', JSON.stringify(cleanList));
+
         // Pre-cache live decrypted passwords using both ID and platform key
-        for (const item of data) {
-          const rawPass = item.password || '';
-          const platKey = item.platform ? item.platform.trim().toLowerCase() : '';
-          let decrypted = rawPass;
-          if (rawPass && rawPass.includes(':') && rawPass.includes('==')) {
-            try {
-              decrypted = await decryptText(rawPass, masterPassword);
-            } catch (e) {
-              decrypted = rawPass;
-            }
-          }
-          if (decrypted) {
+        for (const item of cleanList) {
+          const rawPass = item.passwordEncrypted || '';
+          const platKey = item.platform.trim().toLowerCase();
+          if (rawPass) {
             setDecryptedPasswords(prev => ({ 
               ...prev, 
-              [String(item.id)]: decrypted,
-              [platKey]: decrypted 
+              [item.id]: rawPass,
+              [platKey]: rawPass 
+            }));
+            setRevealedItems(prev => ({ 
+              ...prev, 
+              [item.id]: true,
+              [platKey]: true 
             }));
           }
         }
