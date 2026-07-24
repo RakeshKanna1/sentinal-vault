@@ -906,6 +906,11 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
     if (isUnlocked) {
       syncWithSupabase();
 
+      // Poll cloud every 3 seconds for instant PC & Mobile sync
+      const pollInterval = setInterval(() => {
+        syncWithSupabase();
+      }, 3000);
+
       const channel = supabase
         .channel('sentinel_vault_live_app')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'sentinel_vault' }, () => {
@@ -914,6 +919,7 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
         .subscribe();
 
       return () => {
+        clearInterval(pollInterval);
         supabase.removeChannel(channel);
       };
     }
@@ -1104,15 +1110,27 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
 
       // Push to Supabase Cloud live
       try {
-        await supabase.from('sentinel_vault').upsert({
-          platform: formPlatform,
-          username: formUsername,
-          password: formPassword,
-          notes: formNotes || '',
-          category: formCategory,
-          games_included: formGames || '',
-          updated_at: new Date().toISOString()
-        });
+        const { data: existing } = await supabase.from('sentinel_vault').select('id').eq('platform', formPlatform);
+        if (existing && existing.length > 0) {
+          await supabase.from('sentinel_vault').update({
+            username: formUsername,
+            password: formPassword,
+            notes: formNotes || '',
+            category: formCategory,
+            games_included: formGames || '',
+            updated_at: new Date().toISOString()
+          }).eq('platform', formPlatform);
+        } else {
+          await supabase.from('sentinel_vault').insert({
+            platform: formPlatform,
+            username: formUsername,
+            password: formPassword,
+            notes: formNotes || '',
+            category: formCategory,
+            games_included: formGames || '',
+            updated_at: new Date().toISOString()
+          });
+        }
       } catch (sbErr) {
         console.error("Supabase update error:", sbErr);
       }
