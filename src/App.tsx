@@ -762,70 +762,10 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
         throw new Error('Verification failed');
       }
 
-      // Load items
-      const savedItems = localStorage.getItem('sentinel_vault_items');
-      let currentList: CredentialItem[] = savedItems ? JSON.parse(savedItems) : [];
-
-      // Auto-sync missing default items (items 8, 9, 10)
-      const missingDefaults = [
-        { id: '8', platform: 'Nvidia Geforce Now', username: '12k21rakeshkannam@gmail.com', password: 'Rakesh@111', notes: 'Nvidia GeForce NOW Cloud Gaming account.', gamesList: ['GeForce NOW Cloud Portal'], category: 'nvidia' },
-        { id: '9', platform: 'Steam - Rake_Meccha', username: 'Rake_Meccha', password: 'Rakesh@111', notes: 'Steam library and launcher credentials.', gamesList: ['Cyberpunk 2077', 'The Witcher 3', 'Steam Main Library'], category: 'steam' },
-        { id: '10', platform: 'Xbox Live', username: '12k21rakeshkannam@gmail.com', password: 'Rakesh@111', notes: 'Xbox Pass and Microsoft Store gaming account.', gamesList: ['Halo Infinite', 'Minecraft', 'Gears 5', 'Xbox Game Pass'], category: 'xbox' }
-      ];
-
-      let updateNeeded = false;
-      for (const mItem of missingDefaults) {
-        if (!currentList.some(item => item.id === mItem.id || item.platform === mItem.platform)) {
-          const passEnc = await encryptText(mItem.password, masterPassword);
-          const notesEnc = await encryptText(mItem.notes, masterPassword);
-          currentList.push({
-            id: mItem.id,
-            platform: mItem.platform,
-            username: mItem.username,
-            passwordEncrypted: passEnc,
-            notesEncrypted: notesEnc,
-            gamesList: mItem.gamesList,
-            category: mItem.category as any,
-            strength: checkPasswordStrength(mItem.password),
-            updatedAt: new Date().toLocaleDateString()
-          });
-          updateNeeded = true;
-        }
-      }
-
-      // Attach default gamesList to existing items if missing
-      const defaultGamesMap: Record<string, string[]> = {
-        '1': ['Solo Leveling Arise', 'RPG Launchers'],
-        '2': ['General PC Games', 'Indie Vault'],
-        '3': ['GTA V', 'Red Dead Redemption 2', 'Max Payne 3'],
-        '4': ['Fortnite', 'Epic Games Store Library'],
-        '5': ['Cricket 24', 'EA Sports Cricket'],
-        '6': ['Hitman 3', 'Hitman World of Assassination', 'Mafia Definitive Edition', 'Mafia II', 'Mafia III'],
-        '7': ['Forza Horizon 5', 'Forza Horizon 4', 'Xbox Live'],
-        '8': ['GeForce NOW Cloud Portal'],
-        '9': ['Cyberpunk 2077', 'The Witcher 3', 'Steam Main Library'],
-        '10': ['Halo Infinite', 'Minecraft', 'Gears 5', 'Xbox Game Pass']
-      };
-
-      currentList = currentList.map(item => {
-        if (!item.gamesList || item.gamesList.length === 0) {
-          if (defaultGamesMap[item.id]) {
-            updateNeeded = true;
-            return { ...item, gamesList: defaultGamesMap[item.id] };
-          }
-        }
-        return item;
-      });
-
-      if (updateNeeded) {
-        localStorage.setItem('sentinel_vault_items', JSON.stringify(currentList));
-      }
-
-      setVaultItems(currentList);
-
       setIsUnlocked(true);
       setErrorMsg('');
-      triggerNotification(updateNeeded ? 'Decryption Key Accepted. Vault items synced to 10 keys!' : 'Decryption Key Accepted. Access Granted.');
+      await syncWithSupabase();
+      triggerNotification('Decryption Key Accepted. Access Granted.');
     } catch (err) {
       setErrorMsg('Invalid Decryption Key. Try again.');
       console.error(err);
