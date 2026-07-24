@@ -1615,9 +1615,19 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
                             )}
 
                             <div className="credential-field">
-                              <span className={`credential-value ${!isRevealed ? 'hidden-pass' : ''}`}>
-                                <ScrambledText text={decryptedPass} reveal={isRevealed} />
-                              </span>
+                              {(!decryptedPass && isRevealed) ? (
+                                <button 
+                                  className="btn-secondary interactive" 
+                                  style={{ padding: '4px 12px', fontSize: '11px', borderColor: 'var(--accent-primary)', color: 'var(--accent-primary)' }}
+                                  onClick={() => openEditModal(item)}
+                                >
+                                  + SET PASSWORD
+                                </button>
+                              ) : (
+                                <span className={`credential-value ${!isRevealed ? 'hidden-pass' : ''}`}>
+                                  <ScrambledText text={decryptedPass || 'NO_PASSWORD_SET'} reveal={isRevealed} />
+                                </span>
+                              )}
                               
                               <div className="card-button-row">
                                 <button 
@@ -1626,7 +1636,7 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
                                 >
                                   {isRevealed ? <EyeOff size={14} /> : <Eye size={14} />}
                                 </button>
-                                {isRevealed && (
+                                {isRevealed && decryptedPass && (
                                   <button 
                                     className="btn-card-icon interactive"
                                     onClick={() => copyToClipboard(decryptedPass, 'Password')}
