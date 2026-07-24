@@ -844,14 +844,18 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
   // Decrypt individual item details (in memory)
   const decryptItem = async (itemId: string, cipherText: string, type: 'password' | 'notes') => {
     try {
-      const decrypted = await decryptText(cipherText, masterPassword);
+      let decrypted = cipherText;
+      try {
+        decrypted = await decryptText(cipherText, masterPassword);
+      } catch (e) {
+        decrypted = cipherText;
+      }
       if (type === 'password') {
         setDecryptedPasswords(prev => ({ ...prev, [itemId]: decrypted }));
       } else {
         setDecryptedNotes(prev => ({ ...prev, [itemId]: decrypted }));
       }
     } catch (err) {
-      triggerNotification('Failed to decrypt data.');
       console.error(err);
     }
   };
@@ -931,16 +935,24 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
     setFormCategory(item.category);
     setFormGames(item.gamesList ? item.gamesList.join(', ') : '');
 
-    // Decrypt fields first
+    let pass = item.passwordEncrypted;
+    let notes = item.notesEncrypted;
+
     try {
-      const pass = await decryptText(item.passwordEncrypted, masterPassword);
-      const notes = await decryptText(item.notesEncrypted, masterPassword);
-      setFormPassword(pass);
-      setFormNotes(notes);
-      setShowEditModal(true);
+      pass = await decryptText(item.passwordEncrypted, masterPassword);
     } catch (err) {
-      triggerNotification('Failed to decrypt data for editing.');
+      pass = item.passwordEncrypted;
     }
+
+    try {
+      notes = await decryptText(item.notesEncrypted, masterPassword);
+    } catch (err) {
+      notes = item.notesEncrypted;
+    }
+
+    setFormPassword(pass);
+    setFormNotes(notes);
+    setShowEditModal(true);
   };
 
   // Save edited item
