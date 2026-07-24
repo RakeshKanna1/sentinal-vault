@@ -819,20 +819,23 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
         setVaultItems(cleanList);
         localStorage.setItem('sentinel_vault_items', JSON.stringify(cleanList));
 
-        // Pre-cache live decrypted passwords using both ID and platform key
+        // Pre-cache live decrypted passwords using master password
         for (const item of cleanList) {
           const rawPass = item.passwordEncrypted || '';
           const platKey = item.platform.trim().toLowerCase();
-          if (rawPass) {
+          let decrypted = rawPass;
+          if (rawPass && rawPass.includes(':') && rawPass.includes('==')) {
+            try {
+              decrypted = await decryptText(rawPass, masterPassword);
+            } catch (e) {
+              decrypted = rawPass;
+            }
+          }
+          if (decrypted) {
             setDecryptedPasswords(prev => ({ 
               ...prev, 
-              [item.id]: rawPass,
-              [platKey]: rawPass 
-            }));
-            setRevealedItems(prev => ({ 
-              ...prev, 
-              [item.id]: true,
-              [platKey]: true 
+              [item.id]: decrypted,
+              [platKey]: decrypted 
             }));
           }
         }
