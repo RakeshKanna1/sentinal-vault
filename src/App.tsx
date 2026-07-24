@@ -1705,10 +1705,11 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
                 </div>
               ) : (
                 filteredItems.map((item) => {
-                  const isRevealed = !!revealedItems[item.id];
-                  const isFlipped = !!flippedCards[item.id];
-                  const decryptedPass = decryptedPasswords[item.id] || '';
-                  const decryptedNote = decryptedNotes[item.id] || 'Loading...';
+                  const platKey = item.platform.trim().toLowerCase();
+                  const decryptedPass = decryptedPasswords[item.id] || decryptedPasswords[platKey] || item.passwordEncrypted || '';
+                  const decryptedNote = decryptedNotes[item.id] || decryptedNotes[platKey] || item.notesEncrypted || 'Loading...';
+                  const isRevealed = !!revealedItems[item.id] || !!revealedItems[platKey] || (!!decryptedPass && decryptedPass.length > 0);
+                  const isFlipped = !!flippedCards[item.id] || !!flippedCards[platKey];
 
                   return (
                     <div 
