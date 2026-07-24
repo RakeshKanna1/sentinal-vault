@@ -8,6 +8,8 @@ import {
 import { encryptText, decryptText } from './utils/crypto';
 import { generatePasswordsFromGame } from './utils/gamePasswordGenerator';
 import { SentinelLogo } from './components/SentinelLogo';
+// @ts-ignore
+import { supabase } from './lib/supabase';
 import './App.css';
 
 
@@ -829,6 +831,64 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
       console.error(err);
     }
   };
+
+  // Live Supabase Realtime Sync across PC & Mobile
+  const syncWithSupabase = async () => {
+    try {
+      const { data } = await supabase.from('sentinel_vault').select('*').order('updated_at', { ascending: false });
+      if (data && data.length > 0) {
+        const supabaseMapped: CredentialItem[] = data.map((item: any) => ({
+          id: String(item.id),
+          platform: item.platform,
+          username: item.username,
+          passwordEncrypted: item.password,
+          notesEncrypted: item.notes || '',
+          category: (item.category as any) || 'custom',
+          strength: checkPasswordStrength(item.password),
+          updatedAt: item.updated_at ? new Date(item.updated_at).toLocaleDateString() : new Date().toLocaleDateString(),
+          gamesList: item.games_included ? item.games_included.split(',').map((g: string) => g.trim()) : undefined
+        }));
+
+        setVaultItems((prev) => {
+          const updatedList = [...supabaseMapped];
+          prev.forEach(pItem => {
+            if (!updatedList.some(c => c.id === pItem.id || c.platform === pItem.platform)) {
+              updatedList.push(pItem);
+            }
+          });
+          return updatedList;
+        });
+
+        // Pre-cache live decrypted passwords for instant display
+        setDecryptedPasswords((prev) => {
+          const newMap = { ...prev };
+          data.forEach((item: any) => {
+            newMap[String(item.id)] = item.password;
+          });
+          return newMap;
+        });
+      }
+    } catch (e) {
+      console.error("Supabase sync error:", e);
+    }
+  };
+
+  useEffect(() => {
+    if (isUnlocked) {
+      syncWithSupabase();
+
+      const channel = supabase
+        .channel('sentinel_vault_live_app')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'sentinel_vault' }, () => {
+          syncWithSupabase();
+        })
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }
+  }, [isUnlocked]);
 
   // Lock vault back up
   const handleLockVault = () => {
