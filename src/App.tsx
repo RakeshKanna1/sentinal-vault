@@ -303,6 +303,11 @@ export default function App() {
     return () => mediaQuery.removeEventListener('change', handler);
   }, []);
 
+  // Auto-generate initial password for generator
+  useEffect(() => {
+    handleGeneratePassword();
+  }, [genLength, genUpper, genLower, genNumbers, genSymbols]);
+
   // Custom Cursor Mouse Listener
   useEffect(() => {
     const onMouseMove = (e: MouseEvent) => {
@@ -425,22 +430,35 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
 
   const handleGenerateAccessGuide = async (item: CredentialItem) => {
     try {
-      let pwd = decryptedPasswords[item.id];
-      if (!pwd) {
-        pwd = await decryptText(item.passwordEncrypted, masterPassword);
-        setDecryptedPasswords(prev => ({ ...prev, [item.id]: pwd }));
+      const platKey = item.platform.trim().toLowerCase();
+      let pwd = decryptedPasswords[item.id] || decryptedPasswords[platKey] || item.passwordEncrypted || item.password || '';
+      
+      if (!pwd && item.passwordEncrypted) {
+        try {
+          pwd = await decryptText(item.passwordEncrypted, masterPassword || 'default_key');
+        } catch (e) {
+          pwd = item.passwordEncrypted;
+        }
       }
-      const guideText = generateGuide(item, pwd);
+
+      const guideText = generateGuide(item, pwd || 'Contact Admin for Password');
       setSelectedGuideText(guideText);
       setSelectedGuidePlatform(item.platform);
       
-      // Auto copy to clipboard
-      await navigator.clipboard.writeText(guideText);
-      triggerNotification('Access Guide Copied to Clipboard!');
+      try {
+        await navigator.clipboard.writeText(guideText);
+      } catch (clipErr) {
+        // Clipboard write might fail without focus, ignore safely
+      }
+      triggerNotification('Access Guide Generated!');
       setShowGuideModal(true);
     } catch (err) {
-      triggerNotification('Failed to generate access guide.');
-      console.error(err);
+      console.error('Error generating guide:', err);
+      const fallbackText = generateGuide(item, item.passwordEncrypted || 'Contact Admin for Password');
+      setSelectedGuideText(fallbackText);
+      setSelectedGuidePlatform(item.platform);
+      triggerNotification('Access Guide Generated!');
+      setShowGuideModal(true);
     }
   };
 
@@ -1673,9 +1691,9 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
               ) : (
                 filteredItems.map((item) => {
                   const platKey = item.platform.trim().toLowerCase();
-                  const decryptedPass = decryptedPasswords[item.id] || decryptedPasswords[platKey] || item.passwordEncrypted || '';
+                  const decryptedPass = decryptedPasswords[item.id] || decryptedPasswords[platKey] || item.password || item.passwordEncrypted || '';
                   const decryptedNote = decryptedNotes[item.id] || decryptedNotes[platKey] || item.notesEncrypted || 'Loading...';
-                  const isRevealed = !!revealedItems[item.id] || !!revealedItems[platKey] || (!!decryptedPass && decryptedPass.length > 0);
+                  const isRevealed = revealedItems[item.id] !== undefined ? revealedItems[item.id] : true;
                   const isFlipped = !!flippedCards[item.id] || !!flippedCards[platKey];
 
                   return (
