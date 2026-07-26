@@ -1889,18 +1889,35 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">Category</label>
-                  <select 
-                    className="form-select"
-                    value={formCategory}
-                    onChange={(e) => setFormCategory(e.target.value as any)}
-                  >
-                    <option value="custom">Custom</option>
-                    <option value="steam">Steam</option>
-                    <option value="epic">Epic Games</option>
-                    <option value="xbox">Xbox</option>
-                    <option value="nvidia">Nvidia</option>
-                  </select>
+                  <label className="form-label">Category / Platform Type</label>
+                  <div className="category-select-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: '8px', marginTop: '6px' }}>
+                    {[
+                      { id: 'steam', label: 'Steam', color: '#1a9fff', bg: 'rgba(26, 159, 255, 0.18)', icon: '🎮' },
+                      { id: 'epic', label: 'Epic Games', color: '#0078f2', bg: 'rgba(0, 120, 242, 0.18)', icon: '⚡' },
+                      { id: 'xbox', label: 'Xbox', color: '#107c10', bg: 'rgba(16, 124, 16, 0.18)', icon: '💚' },
+                      { id: 'nvidia', label: 'Nvidia', color: '#76b900', bg: 'rgba(118, 185, 0, 0.18)', icon: '🟢' },
+                      { id: 'custom', label: 'Custom', color: '#ff5b1a', bg: 'rgba(255, 91, 26, 0.18)', icon: '🛡️' },
+                    ].map((cat) => {
+                      const isSelected = formCategory === cat.id;
+                      return (
+                        <button
+                          key={cat.id}
+                          type="button"
+                          onClick={() => setFormCategory(cat.id as any)}
+                          style={{
+                            background: isSelected ? cat.bg : 'rgba(255, 255, 255, 0.03)',
+                            borderColor: isSelected ? cat.color : 'rgba(255, 255, 255, 0.08)',
+                            color: isSelected ? '#ffffff' : '#9ca3af',
+                            boxShadow: isSelected ? `0 0 12px ${cat.bg}` : 'none'
+                          }}
+                          className={`px-2.5 py-2 rounded-lg border text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer hover:border-white/20 ${isSelected ? 'ring-1' : ''}`}
+                        >
+                          <span>{cat.icon}</span>
+                          <span>{cat.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
 
                 <div className="form-group">
@@ -2004,18 +2021,35 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">Category</label>
-                  <select 
-                    className="form-select"
-                    value={formCategory}
-                    onChange={(e) => setFormCategory(e.target.value as any)}
-                  >
-                    <option value="custom">Custom</option>
-                    <option value="steam">Steam</option>
-                    <option value="epic">Epic Games</option>
-                    <option value="xbox">Xbox</option>
-                    <option value="nvidia">Nvidia</option>
-                  </select>
+                  <label className="form-label">Category / Platform Type</label>
+                  <div className="category-select-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: '8px', marginTop: '6px' }}>
+                    {[
+                      { id: 'steam', label: 'Steam', color: '#1a9fff', bg: 'rgba(26, 159, 255, 0.18)', icon: '🎮' },
+                      { id: 'epic', label: 'Epic Games', color: '#0078f2', bg: 'rgba(0, 120, 242, 0.18)', icon: '⚡' },
+                      { id: 'xbox', label: 'Xbox', color: '#107c10', bg: 'rgba(16, 124, 16, 0.18)', icon: '💚' },
+                      { id: 'nvidia', label: 'Nvidia', color: '#76b900', bg: 'rgba(118, 185, 0, 0.18)', icon: '🟢' },
+                      { id: 'custom', label: 'Custom', color: '#ff5b1a', bg: 'rgba(255, 91, 26, 0.18)', icon: '🛡️' },
+                    ].map((cat) => {
+                      const isSelected = formCategory === cat.id;
+                      return (
+                        <button
+                          key={cat.id}
+                          type="button"
+                          onClick={() => setFormCategory(cat.id as any)}
+                          style={{
+                            background: isSelected ? cat.bg : 'rgba(255, 255, 255, 0.03)',
+                            borderColor: isSelected ? cat.color : 'rgba(255, 255, 255, 0.08)',
+                            color: isSelected ? '#ffffff' : '#9ca3af',
+                            boxShadow: isSelected ? `0 0 12px ${cat.bg}` : 'none'
+                          }}
+                          className={`px-2.5 py-2 rounded-lg border text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer hover:border-white/20 ${isSelected ? 'ring-1' : ''}`}
+                        >
+                          <span>{cat.icon}</span>
+                          <span>{cat.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
 
                 <div className="form-group">

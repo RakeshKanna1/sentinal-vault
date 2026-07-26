@@ -873,6 +873,12 @@
   border-color: var(--accent-primary);
 }
 
+.form-select option {
+  background-color: #0d0f17;
+  color: #ffffff;
+  padding: 10px;
+}
+
 .form-row-split {
   display: grid;
   grid-template-columns: 1fr 1fr;
