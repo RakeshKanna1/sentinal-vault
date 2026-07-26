@@ -505,7 +505,8 @@
 
 /* Interactive Card Design */
 .vault-card {
-  height: 240px;
+  min-height: 240px;
+  height: auto;
   position: relative;
   transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 }

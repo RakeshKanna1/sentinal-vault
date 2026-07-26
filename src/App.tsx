@@ -20,6 +20,7 @@ interface CredentialItem {
   category: 'steam' | 'xbox' | 'nvidia' | 'custom';
   strength: 'weak' | 'medium' | 'strong';
   updatedAt: string;
+  games?: string[];
 }
 
 // Scramble Text Component for Cyberpunk Decrypt Effect
@@ -531,13 +532,16 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
 
       // Create defaults from user text file
       const defaultItemsRaw = [
-        { id: '1', platform: 'RAKEJINWO', username: 'jinwosung2', password: 'Rakesh@111', notes: 'Imported launcher credential.', category: 'custom' },
-        { id: '2', platform: 'RAKEGENERAL', username: 'rake_general', password: 'Rakesh@111', notes: 'General gaming account credential.', category: 'custom' },
-        { id: '3', platform: 'ROCKSTAR - STEAM', username: 'Rake_Rockstar', password: 'Rakesh@111', notes: 'Rockstar Games Social Club / Steam integration.', category: 'steam' },
-        { id: '4', platform: 'EPIC GAMES', username: 'cheappcgamesrake@gmail.com', password: 'Rakesh@114', notes: 'Epic Games Store official email login.', category: 'custom' },
-        { id: '5', platform: 'RAKEXURA CRIC', username: 'Rakexura_cric', password: 'rakexura@112', notes: 'Cricket / sports gaming portal.', category: 'custom' },
-        { id: '6', platform: 'RAKEXURA MAFIA AND HITMAN', username: 'rake_hitman', password: 'Rakesh@111', notes: 'Steam launcher keys for Mafia and Hitman collections.', category: 'steam' },
-        { id: '7', platform: 'RAKEXURA FH6', username: 'rakexura_fh6', password: 'rakexura@111', notes: 'Xbox Live / Forza Horizon account.', category: 'xbox' }
+        { id: '1', platform: 'STEAM - RAKE_MECCHA', username: 'Rake_Meccha', password: 'MC_9h0$7_87=-', notes: 'Steam launcher credential.', category: 'steam', games: ['Meccha chameleon'] },
+        { id: '2', platform: 'RAKEGENERAL', username: 'rake_general', password: 'R_4lph4_16!*', notes: 'General gaming account credential.', category: 'custom', games: ['Far cry 4', 'just cause 3', 'rise of tomb', 'Ark Survival evolved', 'Tekken 7', 'cars for sale', 'hitman absolution', 'witcher 1 2 3'] },
+        { id: '3', platform: 'RAKEXURA FH6', username: 'rakexura_fh6', password: 'rakexura@111', notes: 'Xbox Live / Forza Horizon account.', category: 'xbox', games: ['Forza Horizon 5', 'Forza Horizon 4', 'Xbox Live'] },
+        { id: '4', platform: 'RAKEXURA CRIC', username: 'Rakexura_cric', password: 'rakexura@112', notes: 'Cricket / sports gaming portal.', category: 'custom', games: ['Cricket 19'] },
+        { id: '5', platform: 'RAKEXURA MAFIA AND HITMAN', username: 'rake_hitman', password: 'Rakesh@111', notes: 'Steam launcher keys for Mafia and Hitman collections.', category: 'steam', games: ['Hitman 3', 'Hitman World of Assassination', 'Mafia Definitive Edition', 'Mafia II', 'Mafia III'] },
+        { id: '6', platform: 'RAKEJINWO', username: 'jinwosung2', password: 'Rakesh@112', notes: 'Imported launcher credential.', category: 'custom', games: ['Ac Shadows', 'cricket 24', 'palworld', 'ETS2', 'Fc25', 'Fc26', 'REvillage', 'watch dogs 2'] },
+        { id: '7', platform: 'XBOX LIVE', username: '12k21rakeshkannam@gmail.com', password: 'Rakesh@111', notes: 'Xbox Game Pass Ultimate.', category: 'xbox', games: ['Game Pass Ultimate'] },
+        { id: '8', platform: 'NVIDIA GEFORCE NOW', username: '12k21rakeshkannam@gmail.com', password: 'Rakesh@111', notes: 'GeForce Now Priority Membership.', category: 'nvidia', games: ['GeForce Now Priority'] },
+        { id: '9', platform: 'ROCKSTAR - STEAM', username: 'Rake_Rockstar', password: 'Rakesh@111', notes: 'Rockstar Games Social Club / Steam integration.', category: 'steam', games: ['GTA V', 'Red Dead Redemption 2'] },
+        { id: '10', platform: 'EPIC GAMES', username: 'cheappcgamesrake@gmail.com', password: 'Rakesh@114', notes: 'Epic Games Store official email login.', category: 'custom', games: ['Grand Theft Auto V', 'Mystery Games'] }
       ];
 
       const encryptedItems: CredentialItem[] = [];
@@ -552,7 +556,8 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
           notesEncrypted: notesEnc,
           category: item.category as any,
           strength: checkPasswordStrength(item.password),
-          updatedAt: new Date().toLocaleDateString()
+          updatedAt: new Date().toLocaleDateString(),
+          games: item.games
         });
       }
 
@@ -1348,6 +1353,31 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
                               </button>
                             </div>
                           </div>
+
+                          {item.games && item.games.length > 0 && (
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '10px', marginBottom: '8px' }}>
+                              {item.games.map((g, idx) => (
+                                <span
+                                  key={idx}
+                                  style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '4px',
+                                    padding: '2px 8px',
+                                    borderRadius: '12px',
+                                    fontSize: '11px',
+                                    fontWeight: 600,
+                                    background: 'rgba(6, 182, 212, 0.14)',
+                                    border: '1px solid rgba(6, 182, 212, 0.35)',
+                                    color: '#22d3ee'
+                                  }}
+                                >
+                                  <Gamepad2 size={11} />
+                                  {g}
+                                </span>
+                              ))}
+                            </div>
+                          )}
 
                           <div className="card-center">
                             <div className="credential-field">
