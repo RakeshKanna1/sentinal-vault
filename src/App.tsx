@@ -1261,7 +1261,7 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
         <div className="lock-screen">
           <div className="lock-box">
             <div className="lock-icon-container" style={{ background: 'transparent', border: 'none', boxShadow: 'none' }}>
-              <SentinelLogo size={64} />
+              <SentinelLogo size={45} variant="full" />
             </div>
             
             <h1 className="lock-title">
@@ -1333,7 +1333,7 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
           <header className="vault-header">
             <div className="brand-section">
               <div className="brand-logo" style={{ background: 'transparent', boxShadow: 'none' }}>
-                <SentinelLogo size={36} />
+                <SentinelLogo size={34} variant="icon" />
               </div>
               <h1 className="brand-title">
                 RAKEXURA<span>// VAULT</span>
