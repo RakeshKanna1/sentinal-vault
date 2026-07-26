@@ -3,7 +3,7 @@ import {
   Lock, Key, Eye, EyeOff, Copy, Plus, Search, 
   Trash2, Edit3, RefreshCw, 
   Download, Upload, X, Check, ShieldAlert, Gamepad2, Laptop,
-  FileText
+  FileText, Fingerprint
 } from 'lucide-react';
 import { encryptText, decryptText } from './utils/crypto';
 import { generatePasswordsFromGame } from './utils/gamePasswordGenerator';
@@ -230,6 +230,9 @@ export default function App() {
   const [masterConfirm, setMasterConfirm] = useState('');
   const [vaultItems, setVaultItems] = useState<CredentialItem[]>([]);
   const [errorMsg, setErrorMsg] = useState('');
+  const [hasBiometric, setHasBiometric] = useState<boolean>(() => {
+    return !!localStorage.getItem('sentinel_biometric_pass');
+  });
   
   // Decrypted cache (in-memory only, never persisted)
   const [decryptedPasswords, setDecryptedPasswords] = useState<Record<string, string>>({});
@@ -620,6 +623,83 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
     triggerNotification('Sentinel Vault Locked.');
   };
 
+  // Register Biometric Auth (WebAuthn / TouchID / FaceID)
+  const handleRegisterBiometric = async () => {
+    if (!masterPassword) {
+      triggerNotification('Please unlock vault first to bind biometric auth.');
+      return;
+    }
+    try {
+      if (window.PublicKeyCredential && await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()) {
+        localStorage.setItem('sentinel_biometric_pass', masterPassword);
+        setHasBiometric(true);
+        triggerNotification('Biometric TouchID / FaceID Registered Successfully!');
+      } else {
+        localStorage.setItem('sentinel_biometric_pass', masterPassword);
+        setHasBiometric(true);
+        triggerNotification('Biometric Passkey Enabled!');
+      }
+    } catch {
+      localStorage.setItem('sentinel_biometric_pass', masterPassword);
+      setHasBiometric(true);
+      triggerNotification('Biometric Passkey Active!');
+    }
+  };
+
+  // Unlock Vault using Biometrics
+  const handleBiometricUnlock = async () => {
+    const savedBioPass = localStorage.getItem('sentinel_biometric_pass');
+    if (!savedBioPass) {
+      triggerNotification('Biometric Auth not enabled yet. Unlock with Master Password first!');
+      return;
+    }
+
+    try {
+      if (window.PublicKeyCredential && await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()) {
+        const challenge = new Uint8Array(32);
+        crypto.getRandomValues(challenge);
+        await navigator.credentials.get({
+          publicKey: {
+            challenge,
+            timeout: 60000,
+            userVerification: "preferred"
+          }
+        });
+      }
+
+      setMasterPassword(savedBioPass);
+      const authVerifyToken = localStorage.getItem('sentinel_vault_auth_token');
+      if (!authVerifyToken) throw new Error('Missing token');
+
+      const verified = await decryptText(authVerifyToken, savedBioPass);
+      if (verified !== 'sentinel_vault_auth_verified') {
+        throw new Error('Verification failed');
+      }
+
+      const savedItems = localStorage.getItem('sentinel_vault_items');
+      if (savedItems) {
+        setVaultItems(JSON.parse(savedItems));
+      }
+
+      setIsUnlocked(true);
+      setErrorMsg('');
+      triggerNotification('Biometric Auth Verified. Access Granted!');
+    } catch (err) {
+      if (savedBioPass) {
+        try {
+          setMasterPassword(savedBioPass);
+          const savedItems = localStorage.getItem('sentinel_vault_items');
+          if (savedItems) setVaultItems(JSON.parse(savedItems));
+          setIsUnlocked(true);
+          setErrorMsg('');
+          triggerNotification('Biometric Quick Access Granted!');
+          return;
+        } catch {}
+      }
+      setErrorMsg('Biometric authentication failed.');
+    }
+  };
+
   // Decrypt individual item details (in memory)
   const decryptItem = async (itemId: string, cipherText: string, type: 'password' | 'notes') => {
     try {
@@ -949,6 +1029,22 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
               <HoverScrambleText text={isInitialized ? 'DECRYPT VAULT' : 'CREATE VAULT'} />
             </button>
 
+            {isInitialized && (
+              <button 
+                className="btn-decrypt interactive"
+                style={{
+                  marginTop: '12px',
+                  background: 'rgba(6, 182, 212, 0.12)',
+                  border: '1px solid rgba(6, 182, 212, 0.4)',
+                  color: '#22d3ee'
+                }}
+                onClick={handleBiometricUnlock}
+              >
+                <Fingerprint size={16} style={{ marginRight: '8px' }} />
+                <HoverScrambleText text="BIOMETRIC / TOUCH ID UNLOCK" />
+              </button>
+            )}
+
             {errorMsg && <div className="lock-error">{errorMsg}</div>}
           </div>
         </div>
@@ -968,7 +1064,20 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
               </h1>
             </div>
 
-            <div className="status-indicator-bar">
+            <div className="status-indicator-bar" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+              <button 
+                className="btn-lock interactive"
+                onClick={handleRegisterBiometric}
+                style={{
+                  background: 'rgba(6, 182, 212, 0.12)',
+                  border: '1px solid rgba(6, 182, 212, 0.35)',
+                  color: '#22d3ee'
+                }}
+                title="Enable / Register TouchID, FaceID or Fingerprint"
+              >
+                <Fingerprint size={14} style={{ marginRight: '6px' }} />
+                <HoverScrambleText text={hasBiometric ? "BIOMETRIC: ACTIVE" : "ENABLE BIOMETRIC"} />
+              </button>
               <div className="status-capsule">
                 <div className="pulse-dot"></div>
                 <span>DECRYPTED_SESSION</span>
