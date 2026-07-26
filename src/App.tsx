@@ -1236,6 +1236,7 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
   // Calculate quick stats
   const totalKeys = vaultItems.length;
   const steamCount = vaultItems.filter(item => item.category === 'steam').length;
+  const epicCount = vaultItems.filter(item => item.category === 'epic').length;
   const xboxCount = vaultItems.filter(item => item.category === 'xbox').length;
   const nvidiaCount = vaultItems.filter(item => item.category === 'nvidia').length;
 
@@ -1381,6 +1382,11 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
               <div className="stat-card steam">
                 <div className="stat-label">STEAM KEYS</div>
                 <div className="stat-value">{steamCount}</div>
+                <div className="stat-glow"></div>
+              </div>
+              <div className="stat-card epic">
+                <div className="stat-label">EPIC GAMES KEYS</div>
+                <div className="stat-value">{epicCount}</div>
                 <div className="stat-glow"></div>
               </div>
               <div className="stat-card xbox">
@@ -1701,7 +1707,7 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
                   const platKey = item.platform.trim().toLowerCase();
                   const decryptedPass = decryptedPasswords[item.id] || decryptedPasswords[platKey] || item.password || item.passwordEncrypted || '';
                   const decryptedNote = decryptedNotes[item.id] || decryptedNotes[platKey] || item.notesEncrypted || 'Loading...';
-                  const isRevealed = revealedItems[item.id] !== undefined ? revealedItems[item.id] : true;
+                  const isRevealed = !!revealedItems[item.id] || !!revealedItems[platKey];
                   const isFlipped = !!flippedCards[item.id] || !!flippedCards[platKey];
 
                   return (
