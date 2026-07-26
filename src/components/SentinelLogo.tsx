@@ -5,11 +5,11 @@ interface SentinelLogoProps {
   size?: number;
   className?: string;
   glow?: boolean;
-  variant?: 'icon' | 'full';
+  variant?: 'icon' | 'wordmark';
 }
 
 export const SentinelLogo: React.FC<SentinelLogoProps> = ({ 
-  size = 36, 
+  size = 32, 
   className = '', 
   glow = true,
   variant = 'icon'
@@ -19,7 +19,7 @@ export const SentinelLogo: React.FC<SentinelLogoProps> = ({
       <div 
         className={`inline-flex items-center justify-center relative select-none shrink-0 ${className}`}
         style={{
-          filter: glow ? 'drop-shadow(0 0 10px rgba(0, 240, 255, 0.5)) drop-shadow(0 0 16px rgba(250, 204, 21, 0.3))' : 'none'
+          filter: glow ? 'drop-shadow(0 0 8px rgba(0, 240, 255, 0.45)) drop-shadow(0 0 14px rgba(250, 204, 21, 0.25))' : 'none'
         }}
       >
         <svg 
@@ -43,7 +43,7 @@ export const SentinelLogo: React.FC<SentinelLogoProps> = ({
           </defs>
 
           {/* Cyber Outer Shield */}
-          <polygon points="50,6 92,30 92,70 50,94 8,70 8,30" fill="rgba(9, 13, 22, 0.9)" stroke="url(#shieldGrad)" strokeWidth="4" strokeLinejoin="round" />
+          <polygon points="50,6 92,30 92,70 50,94 8,70 8,30" fill="rgba(9, 13, 22, 0.95)" stroke="url(#shieldGrad)" strokeWidth="4" strokeLinejoin="round" />
           <polygon points="50,16 82,34 82,66 50,84 18,66 18,34" fill="none" stroke="rgba(0, 240, 255, 0.3)" strokeWidth="1.5" strokeDasharray="3 3" />
 
           {/* Letter 'V' & Inverted 'A' (V Λ Emblem) */}
