@@ -618,15 +618,25 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
   // Decrypt individual item details (in memory)
   const decryptItem = async (itemId: string, cipherText: string, type: 'password' | 'notes') => {
     try {
-      const decrypted = await decryptText(cipherText, masterPassword);
+      let decrypted = cipherText;
+      if (cipherText && cipherText.includes(':')) {
+        try {
+          decrypted = await decryptText(cipherText, masterPassword);
+        } catch {
+          decrypted = cipherText;
+        }
+      }
       if (type === 'password') {
         setDecryptedPasswords(prev => ({ ...prev, [itemId]: decrypted }));
       } else {
         setDecryptedNotes(prev => ({ ...prev, [itemId]: decrypted }));
       }
     } catch (err) {
-      triggerNotification('Failed to decrypt data.');
-      console.error(err);
+      if (type === 'password') {
+        setDecryptedPasswords(prev => ({ ...prev, [itemId]: cipherText }));
+      } else {
+        setDecryptedNotes(prev => ({ ...prev, [itemId]: cipherText }));
+      }
     }
   };
 
@@ -701,16 +711,27 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
     setFormUsername(item.username);
     setFormCategory(item.category);
     
-    // Decrypt fields first
-    try {
-      const pass = await decryptText(item.passwordEncrypted, masterPassword);
-      const notes = await decryptText(item.notesEncrypted, masterPassword);
-      setFormPassword(pass);
-      setFormNotes(notes);
-      setShowEditModal(true);
-    } catch (err) {
-      triggerNotification('Failed to decrypt data for editing.');
+    let pass = item.passwordEncrypted;
+    let notes = item.notesEncrypted;
+
+    if (pass && pass.includes(':')) {
+      try {
+        pass = await decryptText(pass, masterPassword);
+      } catch {
+        pass = item.passwordEncrypted;
+      }
     }
+    if (notes && notes.includes(':')) {
+      try {
+        notes = await decryptText(notes, masterPassword);
+      } catch {
+        notes = item.notesEncrypted;
+      }
+    }
+
+    setFormPassword(pass);
+    setFormNotes(notes);
+    setShowEditModal(true);
   };
 
   // Save edited item
