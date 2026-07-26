@@ -599,11 +599,13 @@
 .vault-card.steam { --card-accent: var(--accent-steam); }
 .vault-card.xbox { --card-accent: var(--accent-xbox); }
 .vault-card.nvidia { --card-accent: var(--accent-nvidia); }
+.vault-card.epic { --card-accent: var(--accent-epic); }
 .vault-card.custom { --card-accent: var(--accent-custom); }
 
 .vault-card.steam .card-brand-glow { background: var(--accent-steam); }
 .vault-card.xbox .card-brand-glow { background: var(--accent-xbox); }
 .vault-card.nvidia .card-brand-glow { background: var(--accent-nvidia); }
+.vault-card.epic .card-brand-glow { background: var(--accent-epic); }
 .vault-card.custom .card-brand-glow { background: var(--accent-custom); }
 
 .card-top {
