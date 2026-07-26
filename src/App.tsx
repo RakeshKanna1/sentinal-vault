@@ -1728,7 +1728,17 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
                               </div>
                               <div>
                                 <h3 className="card-platform-title">{item.platform}</h3>
-                                <p className="card-username">{item.username}</p>
+                                <div 
+                                  className="card-username-row" 
+                                  style={{ display: 'inline-flex', itemsCenter: 'center', gap: '6px', cursor: 'pointer' }}
+                                  onClick={() => copyToClipboard(item.username, 'Username')}
+                                  title="Click to copy username / email"
+                                >
+                                  <p className="card-username" style={{ margin: 0 }}>{item.username}</p>
+                                  <span style={{ display: 'inline-flex', opacity: 0.6, transition: 'opacity 0.2s' }} className="copy-user-btn">
+                                    <Copy size={11} />
+                                  </span>
+                                </div>
                               </div>
                             </div>
                             
