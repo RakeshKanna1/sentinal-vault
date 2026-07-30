@@ -1749,48 +1749,48 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
                           <div className="card-brand-glow"></div>
                           
                           <div className="card-top">
-                            <div className="card-header-info">
-                              <div className="card-icon-container">
-                                <Gamepad2 size={20} />
-                              </div>
-                              <div>
-                                <h3 className="card-platform-title">{item.platform}</h3>
-                                <div 
-                                  className="card-username-row" 
-                                  style={{ display: 'inline-flex', itemsCenter: 'center', gap: '6px', cursor: 'pointer' }}
-                                  onClick={() => copyToClipboard(item.username, 'Username')}
-                                  title="Click to copy username / email"
-                                >
-                                  <p className="card-username" style={{ margin: 0 }}>{item.username}</p>
-                                  <span style={{ display: 'inline-flex', opacity: 0.6, transition: 'opacity 0.2s' }} className="copy-user-btn">
-                                    <Copy size={11} />
-                                  </span>
+                            <div className="card-header-row">
+                              <div className="card-header-left">
+                                <div className="card-icon-container">
+                                  <Gamepad2 size={20} />
                                 </div>
+                                <h3 className="card-platform-title">{item.platform}</h3>
+                              </div>
+
+                              <div className="card-top-actions">
+                                <button 
+                                  className="btn-card-icon interactive" 
+                                  title="Generate Access Guide"
+                                  onClick={() => handleGenerateAccessGuide(item)}
+                                >
+                                  <FileText size={14} />
+                                </button>
+                                <button 
+                                  className="btn-card-icon interactive" 
+                                  title="Edit Launcher Key"
+                                  onClick={() => openEditModal(item)}
+                                >
+                                  <Edit3 size={14} />
+                                </button>
+                                <button 
+                                  className="btn-card-icon interactive danger-hover" 
+                                  title="Delete Launcher Key"
+                                  onClick={() => handleDeleteItem(item.id)}
+                                >
+                                  <Trash2 size={14} />
+                                </button>
                               </div>
                             </div>
-                            
-                            <div className="card-top-actions">
-                              <button 
-                                className="btn-card-icon interactive" 
-                                title="Generate Access Guide"
-                                onClick={() => handleGenerateAccessGuide(item)}
-                              >
-                                <FileText size={14} />
-                              </button>
-                              <button 
-                                className="btn-card-icon interactive" 
-                                title="Edit Launcher Key"
-                                onClick={() => openEditModal(item)}
-                              >
-                                <Edit3 size={14} />
-                              </button>
-                              <button 
-                                className="btn-card-icon interactive danger-hover" 
-                                title="Delete Launcher Key"
-                                onClick={() => handleDeleteItem(item.id)}
-                              >
-                                <Trash2 size={14} />
-                              </button>
+
+                            <div 
+                              className="card-username-row" 
+                              onClick={() => copyToClipboard(item.username, 'Username')}
+                              title="Click to copy username / email"
+                            >
+                              <span className="card-username">{item.username}</span>
+                              <span style={{ display: 'inline-flex', opacity: 0.6, transition: 'opacity 0.2s' }} className="copy-user-btn">
+                                <Copy size={11} />
+                              </span>
                             </div>
                           </div>
 
