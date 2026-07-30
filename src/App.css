@@ -537,7 +537,7 @@
 
 /* Interactive Card Design */
 .vault-card {
-  min-height: 260px;
+  min-height: 300px;
   height: auto;
   position: relative;
   transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -552,13 +552,15 @@
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--border-dim);
-  padding: 24px;
+  padding: 20px;
+  min-height: 300px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   transition: border-color 0.4s, box-shadow 0.4s;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 .vault-card:hover .card-front,
@@ -710,7 +712,7 @@
 }
 
 .card-center {
-  margin: 16px 0;
+  margin: 12px 0;
 }
 
 .credential-field {
@@ -1252,14 +1254,14 @@
 
   .vault-card {
     height: auto;
-    min-height: 280px;
+    min-height: 300px;
     width: 100%;
   }
 
   .card-front, .card-back {
     padding: 18px;
     border-radius: 16px;
-    min-height: 280px;
+    min-height: 300px;
     height: 100%;
     box-sizing: border-box;
   }
