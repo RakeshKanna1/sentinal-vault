@@ -1769,7 +1769,7 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
                               </div>
                             </div>
                             
-                            <div style={{ display: 'flex', gap: '6px' }}>
+                            <div className="card-top-actions">
                               <button 
                                 className="btn-card-icon interactive" 
                                 title="Generate Access Guide"
@@ -1785,7 +1785,7 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
                                 <Edit3 size={14} />
                               </button>
                               <button 
-                                className="btn-card-icon interactive" 
+                                className="btn-card-icon interactive danger-hover" 
                                 title="Delete Launcher Key"
                                 onClick={() => handleDeleteItem(item.id)}
                               >
