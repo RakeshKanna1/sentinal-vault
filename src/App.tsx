@@ -241,7 +241,7 @@ export default function App() {
 
   // Active filters and inputs
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeTab, setActiveTab] = useState<'all' | 'steam' | 'xbox' | 'nvidia' | 'custom'>('all');
+  const [activeTab, setActiveTab] = useState<'all' | 'steam' | 'xbox' | 'nvidia' | 'epic' | 'custom'>('all');
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingItem, setEditingItem] = useState<CredentialItem | null>(null);
@@ -345,9 +345,36 @@ export default function App() {
     setTimeout(() => setNotification(null), 3000);
   };
 
-  // Copy helper
-  const copyToClipboard = (text: string, label: string) => {
-    navigator.clipboard.writeText(text);
+  // Copy helper with fallback
+  const copyToClipboard = async (text: string, label: string) => {
+    let copied = false;
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        copied = true;
+      }
+    } catch {
+      copied = false;
+    }
+
+    if (!copied) {
+      try {
+        const textarea = document.createElement("textarea");
+        textarea.value = text;
+        textarea.style.position = "fixed";
+        textarea.style.top = "0";
+        textarea.style.left = "0";
+        textarea.style.opacity = "0";
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        copied = document.execCommand("copy");
+        document.body.removeChild(textarea);
+      } catch (err) {
+        console.warn("Copy fallback error:", err);
+      }
+    }
+
     triggerNotification(`${label} Copied to Clipboard!`);
   };
 
@@ -1800,14 +1827,28 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
                                 >
                                   {isRevealed ? <EyeOff size={14} /> : <Eye size={14} />}
                                 </button>
-                                {isRevealed && decryptedPass && (
-                                  <button 
-                                    className="btn-card-icon interactive"
-                                    onClick={() => copyToClipboard(decryptedPass, 'Password')}
-                                  >
-                                    <Copy size={14} />
-                                  </button>
-                                )}
+                                <button 
+                                  className="btn-card-icon interactive"
+                                  onClick={async () => {
+                                    const platKey = item.platform.trim().toLowerCase();
+                                    let pass = decryptedPasswords[item.id] || decryptedPasswords[platKey] || item.passwordEncrypted || '';
+                                    if (!pass && item.passwordEncrypted) {
+                                      try {
+                                        pass = await decryptText(item.passwordEncrypted, masterPassword || 'default_key');
+                                      } catch {
+                                        pass = item.passwordEncrypted;
+                                      }
+                                    }
+                                    if (pass) {
+                                      void copyToClipboard(pass, 'Password');
+                                    } else {
+                                      triggerNotification('No password set!');
+                                    }
+                                  }}
+                                  title="Copy Password to Clipboard"
+                                >
+                                  <Copy size={14} />
+                                </button>
                               </div>
                             </div>
                           </div>
