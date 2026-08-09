@@ -21,7 +21,7 @@ interface CredentialItem {
   passwordEncrypted: string;
   notesEncrypted: string;
   gamesList?: string[];
-  category: 'steam' | 'xbox' | 'nvidia' | 'epic' | 'custom';
+  category: 'steam' | 'xbox' | 'nvidia' | 'epic' | 'ubisoft' | 'custom';
   strength: 'weak' | 'medium' | 'strong';
   updatedAt: string;
 }
@@ -241,7 +241,7 @@ export default function App() {
 
   // Active filters and inputs
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeTab, setActiveTab] = useState<'all' | 'steam' | 'xbox' | 'nvidia' | 'epic' | 'custom'>('all');
+  const [activeTab, setActiveTab] = useState<'all' | 'steam' | 'xbox' | 'nvidia' | 'epic' | 'ubisoft' | 'custom'>('all');
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingItem, setEditingItem] = useState<CredentialItem | null>(null);
@@ -253,7 +253,7 @@ export default function App() {
   const [formPassword, setFormPassword] = useState('');
   const [formNotes, setFormNotes] = useState('');
   const [formGames, setFormGames] = useState('');
-  const [formCategory, setFormCategory] = useState<'steam' | 'xbox' | 'nvidia' | 'epic' | 'custom'>('custom');
+  const [formCategory, setFormCategory] = useState<'steam' | 'xbox' | 'nvidia' | 'epic' | 'ubisoft' | 'custom'>('custom');
 
   // Password Generator States
   const [genLength, setGenLength] = useState(16);
@@ -385,11 +385,14 @@ export default function App() {
     let isSteam = item.category === 'steam';
     let isXbox = item.category === 'xbox';
     let isNvidia = item.category === 'nvidia';
-    let isEpic = false;
+    let isEpic = item.category === 'epic';
+    let isUbisoft = item.category === 'ubisoft';
 
     // Check keywords only for custom platform types
     if (item.category === 'custom') {
-      if (platformLower.includes('xbox') || platformLower.includes('microsoft') || platformLower.includes('fh6') || platformLower.includes('live')) {
+      if (platformLower.includes('ubisoft') || platformLower.includes('uplay')) {
+        isUbisoft = true;
+      } else if (platformLower.includes('xbox') || platformLower.includes('microsoft') || platformLower.includes('fh6') || platformLower.includes('live')) {
         isXbox = true;
       } else if (platformLower.includes('nvidia') || platformLower.includes('geforce')) {
         isNvidia = true;
@@ -405,7 +408,12 @@ export default function App() {
     let step3Text = "Library → All Games";
     let extraImportant = "• Do not enable Steam Guard or family settings";
 
-    if (isXbox) {
+    if (isUbisoft) {
+      launcherName = "Ubisoft Connect";
+      downloadLink = "https://ubisoftconnect.com";
+      step3Text = "Games → My Games";
+      extraImportant = "• Launch with --disable-gpu if screen remains black";
+    } else if (isXbox) {
       launcherName = "Xbox App";
       downloadLink = "https://www.xbox.com/apps/xbox-app-for-pc";
       step3Text = "My Library";
@@ -756,7 +764,8 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
         { id: '7', platform: 'RAKEXURA FH6', username: 'rakexura_fh6', password: 'rakexura@111', notes: 'Xbox Live / Forza Horizon account.', gamesList: ['Forza Horizon 5', 'Forza Horizon 4', 'Xbox Live'], category: 'xbox' },
         { id: '8', platform: 'Nvidia Geforce Now', username: '12k21rakeshkannam@gmail.com', password: 'Rakesh@111', notes: 'Nvidia GeForce NOW Cloud Gaming account.', gamesList: ['GeForce NOW Cloud Portal'], category: 'nvidia' },
         { id: '9', platform: 'Steam - Rake_Meccha', username: 'Rake_Meccha', password: 'Rakesh@111', notes: 'Steam library and launcher credentials.', gamesList: ['Cyberpunk 2077', 'The Witcher 3', 'Steam Main Library'], category: 'steam' },
-        { id: '10', platform: 'Xbox Live', username: '12k21rakeshkannam@gmail.com', password: 'Rakesh@111', notes: 'Xbox Pass and Microsoft Store gaming account.', gamesList: ['Halo Infinite', 'Minecraft', 'Gears 5', 'Xbox Game Pass'], category: 'xbox' }
+        { id: '10', platform: 'Xbox Live', username: '12k21rakeshkannam@gmail.com', password: 'Rakesh@111', notes: 'Xbox Pass and Microsoft Store gaming account.', gamesList: ['Halo Infinite', 'Minecraft', 'Gears 5', 'Xbox Game Pass'], category: 'xbox' },
+        { id: '11', platform: 'UBISOFT CONNECT', username: '12k21rakeshkannam@gmail.com', password: 'Rakesh@111', notes: 'Ubisoft Connect official account credentials.', gamesList: ['Assassin\'s Creed Shadows', 'Far Cry 6', 'Watch Dogs Legion', 'Rainbow Six Siege'], category: 'ubisoft' }
       ];
 
       const encryptedItems: CredentialItem[] = [];
@@ -825,6 +834,7 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
       return gamesIncluded.split(',').map((g: string) => g.trim()).filter(Boolean);
     }
     const platLower = platform.toLowerCase();
+    if (platLower.includes('ubisoft') || platLower.includes('uplay')) return ['Assassin\'s Creed Shadows', 'Far Cry 6', 'Watch Dogs Legion', 'Rainbow Six Siege'];
     if (platLower.includes('jinwo')) return ['Ac Shadows', 'cricket 24', 'palworld', 'ETS2', 'Fc25', 'Fc26', 'REvillage', 'watch dogs 2'];
     if (platLower.includes('general')) return ['Far cry 4', 'just cause 3', 'rise of tomb', 'Ark Survival evolved', 'Tekken 7', 'cars for sale', 'hitman absolution', 'witcher 1 2 3'];
     if (platLower.includes('rockstar')) return ['GTA V'];
@@ -1500,6 +1510,12 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
                   <HoverScrambleText text="EPIC GAMES" />
                 </button>
                 <button 
+                  className={`category-tab interactive ${activeTab === 'ubisoft' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('ubisoft')}
+                >
+                  <HoverScrambleText text="UBISOFT" />
+                </button>
+                <button 
                   className={`category-tab interactive ${activeTab === 'custom' ? 'active' : ''}`}
                   onClick={() => setActiveTab('custom')}
                 >
@@ -1935,6 +1951,7 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
                     {[
                       { id: 'steam', label: 'Steam', color: '#1a9fff', bg: 'rgba(26, 159, 255, 0.18)', icon: '🎮' },
                       { id: 'epic', label: 'Epic Games', color: '#0078f2', bg: 'rgba(0, 120, 242, 0.18)', icon: '⚡' },
+                      { id: 'ubisoft', label: 'Ubisoft', color: '#0070d1', bg: 'rgba(0, 112, 209, 0.18)', icon: '🌀' },
                       { id: 'xbox', label: 'Xbox', color: '#107c10', bg: 'rgba(16, 124, 16, 0.18)', icon: '💚' },
                       { id: 'nvidia', label: 'Nvidia', color: '#76b900', bg: 'rgba(118, 185, 0, 0.18)', icon: '🟢' },
                       { id: 'custom', label: 'Custom', color: '#ff5b1a', bg: 'rgba(255, 91, 26, 0.18)', icon: '🛡️' },
@@ -2067,6 +2084,7 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
                     {[
                       { id: 'steam', label: 'Steam', color: '#1a9fff', bg: 'rgba(26, 159, 255, 0.18)', icon: '🎮' },
                       { id: 'epic', label: 'Epic Games', color: '#0078f2', bg: 'rgba(0, 120, 242, 0.18)', icon: '⚡' },
+                      { id: 'ubisoft', label: 'Ubisoft', color: '#0070d1', bg: 'rgba(0, 112, 209, 0.18)', icon: '🌀' },
                       { id: 'xbox', label: 'Xbox', color: '#107c10', bg: 'rgba(16, 124, 16, 0.18)', icon: '💚' },
                       { id: 'nvidia', label: 'Nvidia', color: '#76b900', bg: 'rgba(118, 185, 0, 0.18)', icon: '🟢' },
                       { id: 'custom', label: 'Custom', color: '#ff5b1a', bg: 'rgba(255, 91, 26, 0.18)', icon: '🛡️' },
