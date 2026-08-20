@@ -358,8 +358,11 @@
 }
 
 .stat-card.steam .stat-glow { background: var(--accent-steam); }
+.stat-card.epic .stat-glow { background: var(--accent-epic); }
 .stat-card.xbox .stat-glow { background: var(--accent-xbox); }
 .stat-card.nvidia .stat-glow { background: var(--accent-nvidia); }
+.stat-card.ubisoft .stat-glow { background: var(--accent-ubisoft); }
+.stat-card.custom .stat-glow { background: var(--accent-custom); }
 .stat-card.total .stat-glow { background: var(--accent-primary); }
 
 .stat-label {

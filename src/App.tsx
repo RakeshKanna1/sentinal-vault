@@ -1390,6 +1390,8 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
   const epicCount = vaultItems.filter(item => item.category === 'epic').length;
   const xboxCount = vaultItems.filter(item => item.category === 'xbox').length;
   const nvidiaCount = vaultItems.filter(item => item.category === 'nvidia').length;
+  const ubisoftCount = vaultItems.filter(item => item.category === 'ubisoft').length;
+  const customCount = vaultItems.filter(item => item.category === 'custom').length;
 
   return (
     <div className="vault-container">
@@ -1541,6 +1543,16 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
               <div className="stat-card nvidia">
                 <div className="stat-label">NVIDIA PORTALS</div>
                 <div className="stat-value">{nvidiaCount}</div>
+                <div className="stat-glow"></div>
+              </div>
+              <div className="stat-card ubisoft">
+                <div className="stat-label">UBISOFT CONNECT</div>
+                <div className="stat-value">{ubisoftCount}</div>
+                <div className="stat-glow"></div>
+              </div>
+              <div className="stat-card custom">
+                <div className="stat-label">CUSTOM KEYS</div>
+                <div className="stat-value">{customCount}</div>
                 <div className="stat-glow"></div>
               </div>
             </section>
