@@ -1,30 +1,33 @@
 :root {
-  --bg-deep: #060608;
-  --bg-card: #0c0d12;
-  --bg-card-hover: #12141c;
-  --border-dim: rgba(255, 255, 255, 0.05);
-  --border-focus: rgba(255, 255, 255, 0.2);
+  --bg-deep: #05060a;
+  --bg-card: #0c0f18;
+  --bg-card-hover: #121624;
+  --border-dim: rgba(255, 255, 255, 0.07);
+  --border-focus: rgba(250, 204, 21, 0.4);
   
   --color-text-primary: #ffffff;
-  --color-text-secondary: #8e919a;
-  --color-text-dim: #545660;
+  --color-text-secondary: #9da5b8;
+  --color-text-dim: #5c6275;
 
   /* Launcher Accents */
   --accent-steam: #1a9fff;
-  --accent-steam-bg: rgba(26, 159, 255, 0.1);
+  --accent-steam-bg: rgba(26, 159, 255, 0.12);
   --accent-xbox: #107c10;
-  --accent-xbox-bg: rgba(16, 124, 16, 0.1);
+  --accent-xbox-bg: rgba(16, 124, 16, 0.12);
   --accent-nvidia: #76b900;
   --accent-nvidia-bg: rgba(118, 185, 0, 0.15);
   --accent-epic: #0078f2;
   --accent-epic-bg: rgba(0, 120, 242, 0.15);
-  --accent-custom: #ff5b1a;
-  --accent-custom-bg: rgba(255, 91, 26, 0.1);
+  --accent-ubisoft: #8b5cf6;
+  --accent-ubisoft-bg: rgba(139, 92, 246, 0.15);
+  --accent-custom: #facc15;
+  --accent-custom-bg: rgba(250, 204, 21, 0.12);
 
   /* Global UI Accents */
-  --accent-primary: #ff5b1a; /* Warm Cyberpunk Copper */
-  --accent-gold: #ffc83b;
-  --glow-primary: rgba(255, 91, 26, 0.35);
+  --accent-primary: #facc15; /* Signature Gold */
+  --accent-amber: #ff5b1a;   /* Cyberpunk Amber */
+  --accent-gold: #facc15;
+  --glow-primary: rgba(250, 204, 21, 0.35);
 
   --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-heading: 'Syne', sans-serif;
@@ -45,7 +48,7 @@
   padding: 0;
 }
 
-/* Show default cursor for precise navigation, but keep the glowing trail */
+/* Show default cursor for precise navigation */
 @media (pointer: fine) {
   * {
     /* cursor: none is removed to allow natural clicking */
@@ -59,69 +62,124 @@ body {
   min-height: 100vh;
   /* Cyberpunk Grid Background */
   background-image: 
-    linear-gradient(rgba(255, 255, 255, 0.007) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.007) 1px, transparent 1px);
-  background-size: 50px 50px;
+    linear-gradient(rgba(255, 255, 255, 0.009) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.009) 1px, transparent 1px);
+  background-size: 48px 48px;
   background-position: center center;
 }
 
-/* Custom Scrollbar */
+/* Custom Sleek Scrollbar */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.18) #05060a;
+}
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--bg-deep);
+  background: #05060a;
 }
 ::-webkit-scrollbar-thumb {
-  background: #181922;
-  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.16);
+  border-radius: 9999px;
+  border: 1px solid #05060a;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--accent-primary);
+  background: rgba(250, 204, 21, 0.5);
 }
 
-/* Custom Cursor styling (Awwwards Style) */
-.custom-cursor {
-  width: 8px;
-  height: 8px;
+/* Tactical HUD Crosshair & Reticle Cursor */
+.custom-cursor.hud-crosshair {
+  width: 5px;
+  height: 5px;
   background: var(--accent-primary);
   border-radius: 50%;
   position: fixed;
   pointer-events: none;
   z-index: 9999;
   transform: translate(-50%, -50%);
-  transition: width 0.3s, height 0.3s, background-color 0.3s;
+  box-shadow: 0 0 10px rgba(250, 204, 21, 0.9);
+  transition: transform 0.15s cubic-bezier(0.32, 0.72, 0, 1), background-color 0.2s ease, width 0.2s ease, height 0.2s ease;
 }
 
-.custom-cursor-follower {
-  width: 40px;
-  height: 40px;
-  border: 1px solid var(--accent-primary);
-  border-radius: 50%;
+.custom-cursor-follower.hud-reticle {
+  width: 28px;
+  height: 28px;
   position: fixed;
   pointer-events: none;
   z-index: 9998;
   transform: translate(-50%, -50%);
-  transition: transform 0.08s ease-out, width 0.3s, height 0.3s, border-color 0.3s;
+  transition: width 0.25s cubic-bezier(0.32, 0.72, 0, 1), 
+              height 0.25s cubic-bezier(0.32, 0.72, 0, 1), 
+              transform 0.25s cubic-bezier(0.32, 0.72, 0, 1);
 }
 
-/* Add hover helper classes to trigger cursor transformations */
-a:hover ~ .custom-cursor,
-button:hover ~ .custom-cursor,
-.interactive:hover ~ .custom-cursor {
-  width: 16px;
-  height: 16px;
-  background-color: var(--accent-gold);
+/* 4 Corner Reticle Brackets */
+.reticle-corner {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-color: rgba(250, 204, 21, 0.55);
+  border-style: solid;
+  transition: all 0.25s cubic-bezier(0.32, 0.72, 0, 1);
 }
 
-a:hover ~ .custom-cursor-follower,
-button:hover ~ .custom-cursor-follower,
-.interactive:hover ~ .custom-cursor-follower {
-  width: 50px;
-  height: 50px;
-  border-color: var(--accent-gold);
-  background: rgba(255, 200, 59, 0.05);
+.reticle-corner.top-left {
+  top: 0;
+  left: 0;
+  border-width: 1.5px 0 0 1.5px;
+}
+
+.reticle-corner.top-right {
+  top: 0;
+  right: 0;
+  border-width: 1.5px 1.5px 0 0;
+}
+
+.reticle-corner.bottom-left {
+  bottom: 0;
+  left: 0;
+  border-width: 0 0 1.5px 1.5px;
+}
+
+.reticle-corner.bottom-right {
+  bottom: 0;
+  right: 0;
+  border-width: 0 1.5px 1.5px 0;
+}
+
+/* Lock-On Target State on Interactive Hover */
+body:has(button:hover) .custom-cursor.hud-crosshair,
+body:has(a:hover) .custom-cursor.hud-crosshair,
+body:has(input:hover) .custom-cursor.hud-crosshair,
+body:has(select:hover) .custom-cursor.hud-crosshair,
+body:has(.interactive:hover) .custom-cursor.hud-crosshair {
+  width: 8px;
+  height: 8px;
+  background-color: #ffffff;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 1);
+}
+
+body:has(button:hover) .custom-cursor-follower.hud-reticle,
+body:has(a:hover) .custom-cursor-follower.hud-reticle,
+body:has(input:hover) .custom-cursor-follower.hud-reticle,
+body:has(select:hover) .custom-cursor-follower.hud-reticle,
+body:has(.interactive:hover) .custom-cursor-follower.hud-reticle {
+  width: 40px;
+  height: 40px;
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+body:has(button:hover) .reticle-corner,
+body:has(a:hover) .reticle-corner,
+body:has(input:hover) .reticle-corner,
+body:has(select:hover) .reticle-corner,
+body:has(.interactive:hover) .reticle-corner {
+  width: 9px;
+  height: 9px;
+  border-color: #facc15;
+  box-shadow: 0 0 8px rgba(250, 204, 21, 0.6);
 }
 
 /* Scramble Animation classes */

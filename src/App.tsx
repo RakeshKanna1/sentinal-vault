@@ -26,6 +26,20 @@ interface CredentialItem {
   updatedAt: string;
 }
 
+export const DEFAULT_VAULT_ITEMS = [
+  { id: '1', platform: 'RAKEJINWO', username: 'jinwosung2', password: 'Rakesh@111', notes: 'Imported launcher credential.', gamesList: ['Solo Leveling Arise', 'RPG Launchers', 'Ac Shadows', 'cricket 24', 'palworld', 'ETS2', 'Fc25', 'Fc26', 'REvillage', 'watch dogs 2'], category: 'custom' as const },
+  { id: '2', platform: 'RAKEGENERAL', username: 'rake_general', password: 'Rakesh@111', notes: 'General gaming account credential.', gamesList: ['Far cry 4', 'just cause 3', 'rise of tomb', 'Ark Survival evolved', 'Tekken 7', 'cars for sale', 'hitman absolution', 'witcher 1 2 3'], category: 'custom' as const },
+  { id: '3', platform: 'ROCKSTAR - STEAM', username: 'Rake_Rockstar', password: 'Rakesh@111', notes: 'Rockstar Games Social Club / Steam integration.', gamesList: ['GTA V', 'Red Dead Redemption 2', 'Max Payne 3'], category: 'steam' as const },
+  { id: '4', platform: 'EPIC GAMES', username: 'cheappcgamesrake@gmail.com', password: 'Rakesh@114', notes: 'Epic Games Store official email login.', gamesList: ['Fortnite', 'GTA V', 'RDR2', 'Hogwarts legacy', 'dead space 3'], category: 'epic' as const },
+  { id: '5', platform: 'RAKEXURA CRIC', username: 'Rakexura_cric', password: 'rakexura@112', notes: 'Cricket / sports gaming portal.', gamesList: ['Cricket 24', 'EA Sports Cricket', 'Cricket 19'], category: 'custom' as const },
+  { id: '6', platform: 'RAKEXURA MAFIA AND HITMAN', username: 'rake_hitman', password: 'Rakesh@111', notes: 'Steam launcher keys for Mafia and Hitman collections.', gamesList: ['Hitman 3', 'Hitman World of Assassination', 'Mafia Definitive Edition', 'Mafia II', 'Mafia III'], category: 'steam' as const },
+  { id: '7', platform: 'RAKEXURA FH6', username: 'rakexura_fh6', password: 'rakexura@111', notes: 'Xbox Live / Forza Horizon account.', gamesList: ['Forza Horizon 5', 'Forza Horizon 4', 'Xbox Live'], category: 'xbox' as const },
+  { id: '8', platform: 'Nvidia Geforce Now', username: '12k21rakeshkannam@gmail.com', password: 'Rakesh@111', notes: 'Nvidia GeForce NOW Cloud Gaming account.', gamesList: ['GeForce NOW Cloud Portal'], category: 'nvidia' as const },
+  { id: '9', platform: 'Steam - Rake_Meccha', username: 'Rake_Meccha', password: 'Rakesh@111', notes: 'Steam library and launcher credentials.', gamesList: ['Cyberpunk 2077', 'The Witcher 3', 'Meccha chameleon', 'Steam Main Library'], category: 'steam' as const },
+  { id: '10', platform: 'Xbox Live', username: '12k21rakeshkannam@gmail.com', password: 'Rakesh@111', notes: 'Xbox Pass and Microsoft Store gaming account.', gamesList: ['Halo Infinite', 'Minecraft', 'Gears 5', 'Xbox Game Pass'], category: 'xbox' as const },
+  { id: '11', platform: 'UBISOFT CONNECT', username: '12k21rakeshkannam@gmail.com', password: 'Rakesh@111', notes: 'Ubisoft Connect official account credentials.', gamesList: ['Assassin\'s Creed Shadows', 'Far Cry 6', 'Watch Dogs Legion', 'Rainbow Six Siege'], category: 'ubisoft' as const }
+];
+
 // Scramble Text Component for Cyberpunk Decrypt Effect
 const ScrambledText: React.FC<{ text: string; reveal: boolean }> = ({ text, reveal }) => {
   const [displayVal, setDisplayVal] = useState('');
@@ -818,8 +832,79 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
         throw new Error('Verification failed');
       }
 
+      // 1. Immediately load items from local storage if present
+      const savedItems = localStorage.getItem('sentinel_vault_items');
+      let currentList: CredentialItem[] = [];
+      if (savedItems) {
+        try {
+          const parsed = JSON.parse(savedItems);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            currentList = parsed;
+          }
+        } catch (e) {
+          console.error("Failed to parse local vault items", e);
+        }
+      }
+
+      // 2. If no local items exist, populate standard vault items
+      if (currentList.length === 0) {
+        const defaultItemsRaw = [
+          { id: '1', platform: 'RAKEJINWO', username: 'jinwosung2', password: 'Rakesh@111', notes: 'Imported launcher credential.', gamesList: ['Solo Leveling Arise', 'RPG Launchers'], category: 'custom' },
+          { id: '2', platform: 'RAKEGENERAL', username: 'rake_general', password: 'Rakesh@111', notes: 'General gaming account credential.', gamesList: ['General PC Games', 'Indie Vault'], category: 'custom' },
+          { id: '3', platform: 'ROCKSTAR - STEAM', username: 'Rake_Rockstar', password: 'Rakesh@111', notes: 'Rockstar Games Social Club / Steam integration.', gamesList: ['GTA V', 'Red Dead Redemption 2', 'Max Payne 3'], category: 'steam' },
+          { id: '4', platform: 'EPIC GAMES', username: 'cheappcgamesrake@gmail.com', password: 'Rakesh@114', notes: 'Epic Games Store official email login.', gamesList: ['Fortnite', 'Epic Games Store Library'], category: 'epic' },
+          { id: '5', platform: 'RAKEXURA CRIC', username: 'Rakexura_cric', password: 'rakexura@112', notes: 'Cricket / sports gaming portal.', gamesList: ['Cricket 24', 'EA Sports Cricket'], category: 'custom' },
+          { id: '6', platform: 'RAKEXURA MAFIA AND HITMAN', username: 'rake_hitman', password: 'Rakesh@111', notes: 'Steam launcher keys for Mafia and Hitman collections.', gamesList: ['Hitman 3', 'Hitman World of Assassination', 'Mafia Definitive Edition', 'Mafia II', 'Mafia III'], category: 'steam' },
+          { id: '7', platform: 'RAKEXURA FH6', username: 'rakexura_fh6', password: 'rakexura@111', notes: 'Xbox Live / Forza Horizon account.', gamesList: ['Forza Horizon 5', 'Forza Horizon 4', 'Xbox Live'], category: 'xbox' },
+          { id: '8', platform: 'Nvidia Geforce Now', username: '12k21rakeshkannam@gmail.com', password: 'Rakesh@111', notes: 'Nvidia GeForce NOW Cloud Gaming account.', gamesList: ['GeForce NOW Cloud Portal'], category: 'nvidia' },
+          { id: '9', platform: 'Steam - Rake_Meccha', username: 'Rake_Meccha', password: 'Rakesh@111', notes: 'Steam library and launcher credentials.', gamesList: ['Cyberpunk 2077', 'The Witcher 3', 'Steam Main Library'], category: 'steam' },
+          { id: '10', platform: 'Xbox Live', username: '12k21rakeshkannam@gmail.com', password: 'Rakesh@111', notes: 'Xbox Pass and Microsoft Store gaming account.', gamesList: ['Halo Infinite', 'Minecraft', 'Gears 5', 'Xbox Game Pass'], category: 'xbox' },
+          { id: '11', platform: 'UBISOFT CONNECT', username: '12k21rakeshkannam@gmail.com', password: 'Rakesh@111', notes: 'Ubisoft Connect official account credentials.', gamesList: ['Assassin\'s Creed Shadows', 'Far Cry 6', 'Watch Dogs Legion', 'Rainbow Six Siege'], category: 'ubisoft' }
+        ];
+
+        for (const item of defaultItemsRaw) {
+          const passEnc = await encryptText(item.password, masterPassword);
+          const notesEnc = await encryptText(item.notes, masterPassword);
+          currentList.push({
+            id: item.id,
+            platform: item.platform,
+            username: item.username,
+            passwordEncrypted: passEnc,
+            notesEncrypted: notesEnc,
+            gamesList: item.gamesList,
+            category: item.category as any,
+            strength: checkPasswordStrength(item.password),
+            updatedAt: new Date().toLocaleDateString()
+          });
+        }
+        localStorage.setItem('sentinel_vault_items', JSON.stringify(currentList));
+      }
+
+      setVaultItems(currentList);
       setIsUnlocked(true);
       setErrorMsg('');
+
+      // Pre-cache live decrypted passwords using master password
+      for (const item of currentList) {
+        const rawPass = item.passwordEncrypted || '';
+        const platKey = item.platform.trim().toLowerCase();
+        let decrypted = rawPass;
+        if (rawPass && rawPass.includes(':') && rawPass.includes('==')) {
+          try {
+            decrypted = await decryptText(rawPass, masterPassword);
+          } catch (e) {
+            decrypted = '';
+          }
+        }
+        if (decrypted) {
+          setDecryptedPasswords(prev => ({ 
+            ...prev, 
+            [item.id]: decrypted,
+            [platKey]: decrypted 
+          }));
+        }
+      }
+
       await syncWithSupabase();
       triggerNotification('Decryption Key Accepted. Access Granted.');
     } catch (err) {
@@ -852,9 +937,9 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
   const syncWithSupabase = async () => {
     try {
       const { data } = await supabase.from('sentinel_vault').select('*').order('updated_at', { ascending: false });
-      if (data && data.length > 0) {
-        const dedupMap = new Map<string, CredentialItem>();
+      const dedupMap = new Map<string, CredentialItem>();
 
+      if (data && data.length > 0) {
         data.forEach((item: any) => {
           const key = item.platform.trim().toLowerCase();
           if (!dedupMap.has(key)) {
@@ -871,30 +956,59 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
             });
           }
         });
+      }
 
-        const cleanList = Array.from(dedupMap.values());
-        setVaultItems(cleanList);
-        localStorage.setItem('sentinel_vault_items', JSON.stringify(cleanList));
+      // Merge all 11 default accounts if missing from cloud
+      for (const def of DEFAULT_VAULT_ITEMS) {
+        const key = def.platform.trim().toLowerCase();
+        if (!dedupMap.has(key)) {
+          dedupMap.set(key, {
+            id: def.id,
+            platform: def.platform,
+            username: def.username,
+            passwordEncrypted: def.password,
+            notesEncrypted: def.notes,
+            gamesList: def.gamesList,
+            category: def.category,
+            strength: checkPasswordStrength(def.password),
+            updatedAt: new Date().toLocaleDateString()
+          });
 
-        // Pre-cache live decrypted passwords using master password
-        for (const item of cleanList) {
-          const rawPass = item.passwordEncrypted || '';
-          const platKey = item.platform.trim().toLowerCase();
-          let decrypted = rawPass;
-          if (rawPass && rawPass.includes(':') && rawPass.includes('==')) {
-            try {
-              decrypted = await decryptText(rawPass, masterPassword);
-            } catch (e) {
-              decrypted = '';
-            }
+          // Upload missing default item to Supabase in background
+          supabase.from('sentinel_vault').upsert({
+            platform: def.platform,
+            username: def.username,
+            password: def.password,
+            notes: def.notes,
+            category: def.category,
+            games_included: def.gamesList.join(', '),
+            updated_at: new Date().toISOString()
+          }).then(() => {}).catch(() => {});
+        }
+      }
+
+      const cleanList = Array.from(dedupMap.values());
+      setVaultItems(cleanList);
+      localStorage.setItem('sentinel_vault_items', JSON.stringify(cleanList));
+
+      // Pre-cache live decrypted passwords using master password
+      for (const item of cleanList) {
+        const rawPass = item.passwordEncrypted || '';
+        const platKey = item.platform.trim().toLowerCase();
+        let decrypted = rawPass;
+        if (rawPass && rawPass.includes(':') && rawPass.includes('==')) {
+          try {
+            decrypted = await decryptText(rawPass, masterPassword);
+          } catch (e) {
+            decrypted = '';
           }
-          if (decrypted) {
-            setDecryptedPasswords(prev => ({ 
-              ...prev, 
-              [item.id]: decrypted,
-              [platKey]: decrypted 
-            }));
-          }
+        }
+        if (decrypted) {
+          setDecryptedPasswords(prev => ({ 
+            ...prev, 
+            [item.id]: decrypted,
+            [platKey]: decrypted 
+          }));
         }
       }
     } catch (e) {
@@ -1280,13 +1394,6 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
   return (
     <div className="vault-container">
       <ParticleBackground />
-      {/* Visual Cursor Followers for Awwwards Aesthetic */}
-      {isDesktop && (
-        <>
-          <div className="custom-cursor" style={{ left: `${cursorPos.x}px`, top: `${cursorPos.y}px` }}></div>
-          <div className="custom-cursor-follower" style={{ left: `${followerPos.x}px`, top: `${followerPos.y}px` }}></div>
-        </>
-      )}
 
       {/* Floating Notification */}
       {notification && (
@@ -2241,6 +2348,31 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
             </div>
           </div>
         </div>
+      )}
+
+      {/* Interactive Tactical HUD Crosshair Cursor */}
+      {isDesktop && (
+        <>
+          <div 
+            className="custom-cursor hud-crosshair"
+            style={{
+              left: `${cursorPos.x}px`,
+              top: `${cursorPos.y}px`,
+            }}
+          />
+          <div 
+            className="custom-cursor-follower hud-reticle"
+            style={{
+              left: `${followerPos.x}px`,
+              top: `${followerPos.y}px`,
+            }}
+          >
+            <div className="reticle-corner top-left" />
+            <div className="reticle-corner top-right" />
+            <div className="reticle-corner bottom-left" />
+            <div className="reticle-corner bottom-right" />
+          </div>
+        </>
       )}
     </div>
   );
