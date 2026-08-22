@@ -38,7 +38,7 @@ export const PLATFORM_SELECT_OPTIONS = [
 
 export const DEFAULT_VAULT_ITEMS = [
   { id: '1', platform: 'RAKEJINWO', username: 'jinwosung2', password: 'Rakesh@111', notes: 'Imported launcher credential.', gamesList: ['Solo Leveling Arise', 'RPG Launchers', 'Ac Shadows', 'cricket 24', 'palworld', 'ETS2', 'Fc25', 'Fc26', 'REvillage', 'watch dogs 2'], category: 'custom' as const },
-  { id: '2', platform: 'RAKEGENERAL', username: 'rake_general', password: 'Rakesh@111', notes: 'General gaming account credential.', gamesList: ['Far cry 4', 'just cause 3', 'rise of tomb', 'Ark Survival evolved', 'Tekken 7', 'cars for sale', 'hitman absolution', 'witcher 1 2 3'], category: 'custom' as const },
+  { id: '2', platform: 'RAKEGENERAL', username: 'rake_general', password: 'Rakesh@111', notes: 'General gaming account credential.', gamesList: ['Far cry 4', 'just cause 3', 'rise of tomb', 'Ark Survival evolved', 'Tekken 7', 'cars for sale', 'hitman absolution', 'witcher 1 2 3'], category: 'steam' as const },
   { id: '3', platform: 'ROCKSTAR - STEAM', username: 'Rake_Rockstar', password: 'Rakesh@111', notes: 'Rockstar Games Social Club / Steam integration.', gamesList: ['GTA V', 'Red Dead Redemption 2', 'Max Payne 3'], category: 'steam' as const },
   { id: '4', platform: 'EPIC GAMES', username: 'cheappcgamesrake@gmail.com', password: 'Rakesh@114', notes: 'Epic Games Store official email login.', gamesList: ['Fortnite', 'GTA V', 'RDR2', 'Hogwarts legacy', 'dead space 3'], category: 'epic' as const },
   { id: '5', platform: 'RAKEXURA CRIC', username: 'Rakexura_cric', password: 'rakexura@112', notes: 'Cricket / sports gaming portal.', gamesList: ['Cricket 24', 'EA Sports Cricket', 'Cricket 19'], category: 'custom' as const },
@@ -928,18 +928,11 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
     if (gamesIncluded && gamesIncluded.trim().length > 0) {
       return gamesIncluded.split(',').map((g: string) => g.trim()).filter(Boolean);
     }
-    const platLower = platform.toLowerCase();
-    if (platLower.includes('ubisoft') || platLower.includes('uplay')) return ['Assassin\'s Creed Shadows', 'Far Cry 6', 'Watch Dogs Legion', 'Rainbow Six Siege'];
-    if (platLower.includes('jinwo')) return ['Ac Shadows', 'cricket 24', 'palworld', 'ETS2', 'Fc25', 'Fc26', 'REvillage', 'watch dogs 2'];
-    if (platLower.includes('general')) return ['Far cry 4', 'just cause 3', 'rise of tomb', 'Ark Survival evolved', 'Tekken 7', 'cars for sale', 'hitman absolution', 'witcher 1 2 3'];
-    if (platLower.includes('rockstar')) return ['GTA V'];
-    if (platLower.includes('epic')) return ['Fortnite', 'GTA V', 'RDR2', 'Hogwarts legacy', 'dead space 3'];
-    if (platLower.includes('cric')) return ['Cricket 19'];
-    if (platLower.includes('mafia') || platLower.includes('hitman')) return ['Hitman 3', 'Hitman World of Assassination', 'Mafia Definitive Edition', 'Mafia II', 'Mafia III'];
-    if (platLower.includes('fh6') || platLower.includes('forza')) return ['Forza Horizon 5', 'Forza Horizon 4', 'Xbox Live'];
-    if (platLower.includes('nvidia') || platLower.includes('geforce')) return ['GeForce NOW Cloud Portal'];
-    if (platLower.includes('meccha')) return ['Meccha chameleon'];
-    if (platLower.includes('xbox')) return ['Halo Infinite', 'Minecraft', 'Gears 5', 'Xbox Game Pass'];
+    const platLower = (platform || '').trim().toLowerCase();
+    const matched = DEFAULT_VAULT_ITEMS.find(d => d.platform.trim().toLowerCase() === platLower);
+    if (matched && matched.gamesList) {
+      return matched.gamesList;
+    }
     return ['General PC Games', 'Vault Account'];
   };
 
@@ -1219,7 +1212,7 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
       const gamesParsed = formGames ? formGames.split(',').map(g => g.trim()).filter(Boolean) : undefined;
 
       const updatedList = vaultItems.map((item) => {
-        if (item.id === editingItem.id) {
+        if (item.id === editingItem.id || item.platform.trim().toLowerCase() === editingItem.platform.trim().toLowerCase()) {
           return {
             ...item,
             platform: formPlatform,
@@ -1251,7 +1244,7 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
             category: formCategory,
             games_included: formGames || '',
             updated_at: new Date().toISOString()
-          }).eq('platform', matchPlatform);
+          }).eq('id', existing[0].id);
         } else {
           await supabase.from('sentinel_vault').upsert({
             platform: formPlatform,
