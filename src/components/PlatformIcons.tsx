@@ -14,11 +14,16 @@ export const SteamIcon: React.FC<IconProps> = ({ size = 16, className = "", styl
   </svg>
 );
 
-// Epic Games Store Authentic Vector Emblem (Beveled Shield + Stylized 'E')
+// Epic Games Store Authentic Logo
 export const EpicGamesIcon: React.FC<IconProps> = ({ size = 16, className = "", style = {} }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" className={className} style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0, ...style }}>
-    <path d="M4.6 1.5h14.8c.6 0 1.1.5 1.1 1.1v12.6c0 4.1-3.6 7.4-8.5 8.7-.2.1-.5.1-.7 0-4.9-1.3-8.5-4.6-8.5-8.7V2.6c0-.6.5-1.1 1.1-1.1zm7.4 3.1-5.7 1.8v8c0 3 2.7 5.6 5.7 6.6 3-1 5.7-3.6 5.7-6.6v-8l-5.7-1.8zm-2.4 3.7h4.8v1.8h-2.9v1.4h2.5v1.7h-2.5v1.4h3v1.8H9.6V8.3z"/>
-  </svg>
+  <img 
+    src="/assets/epic-games-logo.png" 
+    alt="Epic Games" 
+    width={size} 
+    height={size} 
+    className={className} 
+    style={{ width: `${size}px`, height: `${size}px`, objectFit: 'contain', display: 'inline-block', verticalAlign: 'middle', flexShrink: 0, ...style }} 
+  />
 );
 
 // Ubisoft Official Optical Swirl
@@ -28,18 +33,28 @@ export const UbisoftIcon: React.FC<IconProps> = ({ size = 16, className = "", st
   </svg>
 );
 
-// Microsoft Xbox Authentic Sphere
+// Microsoft Xbox Authentic Logo
 export const XboxIcon: React.FC<IconProps> = ({ size = 16, className = "", style = {} }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" className={className} style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0, ...style }}>
-    <path d="M4.154 3.125C6.182 1.48 8.878.5 11.996.5c3.12 0 5.816.98 7.844 2.625 1.573 1.275-5.26 8.528-7.844 11.96-2.584-3.432-9.42-10.685-7.842-11.96zM1.05 6.012c-.55 1.786-.85 3.684-.85 5.656 0 4.965 2.012 9.462 5.27 12.72-3.155-3.424-4.823-11.02-4.42-18.376zm21.9 0c.403 7.356-1.265 14.952-4.42 18.376 3.258-3.258 5.27-7.755 5.27-12.72 0-1.972-.3-3.87-.85-5.656zm-17.78 14.4c2.025 1.95 4.8 3.088 7.83 3.088s5.805-1.138 7.83-3.088c-2.457-3.21-6.195-7.733-7.83-10.155-1.635 2.422-5.373 6.945-7.83 10.155z"/>
-  </svg>
+  <img 
+    src="/assets/xbox-logo.png" 
+    alt="Xbox" 
+    width={size} 
+    height={size} 
+    className={className} 
+    style={{ width: `${size}px`, height: `${size}px`, objectFit: 'contain', display: 'inline-block', verticalAlign: 'middle', flexShrink: 0, ...style }} 
+  />
 );
 
-// NVIDIA Authentic Claw Loop
+// NVIDIA Authentic Logo
 export const NvidiaIcon: React.FC<IconProps> = ({ size = 16, className = "", style = {} }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" className={className} style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0, ...style }}>
-    <path d="M8.974 7.64c0-.288.163-.55.42-.676 1.838-.9 3.655-.98 4.793-.728.29.064.503.316.503.612v9.293a.62.62 0 0 1-.62.62h-4.476a.62.62 0 0 1-.62-.62V7.64zm-3.882 1.488c0-.285.16-.546.414-.674 3.04-1.536 5.86-1.583 7.57-1.127.302.08.514.354.514.667v8.948a.62.62 0 0 1-.62.62H5.712a.62.62 0 0 1-.62-.62V9.128zm-3.87 2.052c0-.28.156-.537.403-.668 4.316-2.296 8.358-2.24 10.74-1.52.316.096.537.388.537.718v7.41a.62.62 0 0 1-.62.62H1.842a.62.62 0 0 1-.62-.62V11.18z"/>
-  </svg>
+  <img 
+    src="/assets/nvidia-logo.png" 
+    alt="Nvidia GeForce" 
+    width={size} 
+    height={size} 
+    className={className} 
+    style={{ width: `${size}px`, height: `${size}px`, objectFit: 'contain', display: 'inline-block', verticalAlign: 'middle', flexShrink: 0, ...style }} 
+  />
 );
 
 // Sentinel Shield Vector
