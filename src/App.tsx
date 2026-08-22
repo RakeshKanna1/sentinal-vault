@@ -3,11 +3,12 @@ import {
   Lock, Eye, EyeOff, Copy, Plus, Search, 
   Trash2, Edit3, RefreshCw, 
   Download, Upload, X, Check, ShieldAlert, Gamepad2, Laptop,
-  FileText, Fingerprint
+  FileText, Fingerprint, Shield
 } from 'lucide-react';
 import { encryptText, decryptText } from './utils/crypto';
 import { generatePasswordsFromGame } from './utils/gamePasswordGenerator';
 import { SentinelLogo } from './components/SentinelLogo';
+import { SteamIcon, EpicGamesIcon, UbisoftIcon, XboxIcon, NvidiaIcon, getPlatformIcon } from './components/PlatformIcons';
 // @ts-ignore
 import { supabase } from './lib/supabase';
 import './App.css';
@@ -25,6 +26,15 @@ interface CredentialItem {
   strength: 'weak' | 'medium' | 'strong';
   updatedAt: string;
 }
+
+export const PLATFORM_SELECT_OPTIONS = [
+  { id: 'steam', label: 'Steam', color: '#1a9fff', bg: 'rgba(26, 159, 255, 0.16)', Icon: SteamIcon },
+  { id: 'epic', label: 'Epic Games', color: '#0078f2', bg: 'rgba(0, 120, 242, 0.16)', Icon: EpicGamesIcon },
+  { id: 'ubisoft', label: 'Ubisoft', color: '#00a2ff', bg: 'rgba(0, 162, 255, 0.16)', Icon: UbisoftIcon },
+  { id: 'xbox', label: 'Xbox', color: '#107c10', bg: 'rgba(16, 124, 16, 0.16)', Icon: XboxIcon },
+  { id: 'nvidia', label: 'Nvidia', color: '#76b900', bg: 'rgba(118, 185, 0, 0.16)', Icon: NvidiaIcon },
+  { id: 'custom', label: 'Custom', color: '#facc15', bg: 'rgba(250, 204, 21, 0.14)', Icon: Shield },
+];
 
 export const DEFAULT_VAULT_ITEMS = [
   { id: '1', platform: 'RAKEJINWO', username: 'jinwosung2', password: 'Rakesh@111', notes: 'Imported launcher credential.', gamesList: ['Solo Leveling Arise', 'RPG Launchers', 'Ac Shadows', 'cricket 24', 'palworld', 'ETS2', 'Fc25', 'Fc26', 'REvillage', 'watch dogs 2'], category: 'custom' as const },
@@ -1230,18 +1240,10 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
 
       // Push to Supabase Cloud live
       try {
-        const { data: existing } = await supabase.from('sentinel_vault').select('id').eq('platform', formPlatform);
+        const matchPlatform = editingItem.platform || formPlatform;
+        const { data: existing } = await supabase.from('sentinel_vault').select('id').eq('platform', matchPlatform);
         if (existing && existing.length > 0) {
           await supabase.from('sentinel_vault').update({
-            username: formUsername,
-            password: formPassword,
-            notes: formNotes || '',
-            category: formCategory,
-            games_included: formGames || '',
-            updated_at: new Date().toISOString()
-          }).eq('platform', formPlatform);
-        } else {
-          await supabase.from('sentinel_vault').insert({
             platform: formPlatform,
             username: formUsername,
             password: formPassword,
@@ -1249,7 +1251,17 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
             category: formCategory,
             games_included: formGames || '',
             updated_at: new Date().toISOString()
-          });
+          }).eq('platform', matchPlatform);
+        } else {
+          await supabase.from('sentinel_vault').upsert({
+            platform: formPlatform,
+            username: formUsername,
+            password: formPassword,
+            notes: formNotes || '',
+            category: formCategory,
+            games_included: formGames || '',
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'platform' });
         }
       } catch (sbErr) {
         console.error("Supabase update error:", sbErr);
@@ -1887,7 +1899,7 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
                             <div className="card-header-row">
                               <div className="card-header-left">
                                 <div className="card-icon-container">
-                                  <Gamepad2 size={20} />
+                                  {getPlatformIcon(item.category, 20)}
                                 </div>
                                 <h3 className="card-platform-title">{item.platform}</h3>
                               </div>
@@ -2066,16 +2078,10 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
 
                 <div className="form-group">
                   <label className="form-label">Category / Platform Type</label>
-                  <div className="category-select-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: '8px', marginTop: '6px' }}>
-                    {[
-                      { id: 'steam', label: 'Steam', color: '#1a9fff', bg: 'rgba(26, 159, 255, 0.18)', icon: '🎮' },
-                      { id: 'epic', label: 'Epic Games', color: '#0078f2', bg: 'rgba(0, 120, 242, 0.18)', icon: '⚡' },
-                      { id: 'ubisoft', label: 'Ubisoft', color: '#0070d1', bg: 'rgba(0, 112, 209, 0.18)', icon: '🌀' },
-                      { id: 'xbox', label: 'Xbox', color: '#107c10', bg: 'rgba(16, 124, 16, 0.18)', icon: '💚' },
-                      { id: 'nvidia', label: 'Nvidia', color: '#76b900', bg: 'rgba(118, 185, 0, 0.18)', icon: '🟢' },
-                      { id: 'custom', label: 'Custom', color: '#ff5b1a', bg: 'rgba(255, 91, 26, 0.18)', icon: '🛡️' },
-                    ].map((cat) => {
+                  <div className="category-select-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: '8px', marginTop: '8px' }}>
+                    {PLATFORM_SELECT_OPTIONS.map((cat) => {
                       const isSelected = formCategory === cat.id;
+                      const IconComponent = cat.Icon;
                       return (
                         <button
                           key={cat.id}
@@ -2085,12 +2091,12 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
                             background: isSelected ? cat.bg : 'rgba(255, 255, 255, 0.03)',
                             borderColor: isSelected ? cat.color : 'rgba(255, 255, 255, 0.08)',
                             color: isSelected ? '#ffffff' : '#9ca3af',
-                            boxShadow: isSelected ? `0 0 12px ${cat.bg}` : 'none'
+                            boxShadow: isSelected ? `0 0 16px ${cat.bg}, inset 0 0 8px ${cat.bg}` : 'none'
                           }}
-                          className={`px-2.5 py-2 rounded-lg border text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer hover:border-white/20 ${isSelected ? 'ring-1' : ''}`}
+                          className={`px-3 py-2.5 rounded-lg border text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer hover:border-white/25 hover:text-white ${isSelected ? 'ring-1' : ''}`}
                         >
-                          <span>{cat.icon}</span>
-                          <span>{cat.label}</span>
+                          <IconComponent size={15} style={{ color: isSelected ? cat.color : '#858d9d', flexShrink: 0 }} />
+                          <span style={{ letterSpacing: '0.3px' }}>{cat.label}</span>
                         </button>
                       );
                     })}
@@ -2199,16 +2205,10 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
 
                 <div className="form-group">
                   <label className="form-label">Category / Platform Type</label>
-                  <div className="category-select-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: '8px', marginTop: '6px' }}>
-                    {[
-                      { id: 'steam', label: 'Steam', color: '#1a9fff', bg: 'rgba(26, 159, 255, 0.18)', icon: '🎮' },
-                      { id: 'epic', label: 'Epic Games', color: '#0078f2', bg: 'rgba(0, 120, 242, 0.18)', icon: '⚡' },
-                      { id: 'ubisoft', label: 'Ubisoft', color: '#0070d1', bg: 'rgba(0, 112, 209, 0.18)', icon: '🌀' },
-                      { id: 'xbox', label: 'Xbox', color: '#107c10', bg: 'rgba(16, 124, 16, 0.18)', icon: '💚' },
-                      { id: 'nvidia', label: 'Nvidia', color: '#76b900', bg: 'rgba(118, 185, 0, 0.18)', icon: '🟢' },
-                      { id: 'custom', label: 'Custom', color: '#ff5b1a', bg: 'rgba(255, 91, 26, 0.18)', icon: '🛡️' },
-                    ].map((cat) => {
+                  <div className="category-select-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: '8px', marginTop: '8px' }}>
+                    {PLATFORM_SELECT_OPTIONS.map((cat) => {
                       const isSelected = formCategory === cat.id;
+                      const IconComponent = cat.Icon;
                       return (
                         <button
                           key={cat.id}
@@ -2218,12 +2218,12 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
                             background: isSelected ? cat.bg : 'rgba(255, 255, 255, 0.03)',
                             borderColor: isSelected ? cat.color : 'rgba(255, 255, 255, 0.08)',
                             color: isSelected ? '#ffffff' : '#9ca3af',
-                            boxShadow: isSelected ? `0 0 12px ${cat.bg}` : 'none'
+                            boxShadow: isSelected ? `0 0 16px ${cat.bg}, inset 0 0 8px ${cat.bg}` : 'none'
                           }}
-                          className={`px-2.5 py-2 rounded-lg border text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer hover:border-white/20 ${isSelected ? 'ring-1' : ''}`}
+                          className={`px-3 py-2.5 rounded-lg border text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer hover:border-white/25 hover:text-white ${isSelected ? 'ring-1' : ''}`}
                         >
-                          <span>{cat.icon}</span>
-                          <span>{cat.label}</span>
+                          <IconComponent size={15} style={{ color: isSelected ? cat.color : '#858d9d', flexShrink: 0 }} />
+                          <span style={{ letterSpacing: '0.3px' }}>{cat.label}</span>
                         </button>
                       );
                     })}
