@@ -9,19 +9,19 @@
   --color-text-secondary: #9da5b8;
   --color-text-dim: #5c6275;
 
-  /* Launcher Accents */
-  --accent-steam: #1a9fff;
-  --accent-steam-bg: rgba(26, 159, 255, 0.12);
-  --accent-xbox: #107c10;
-  --accent-xbox-bg: rgba(16, 124, 16, 0.12);
-  --accent-nvidia: #76b900;
-  --accent-nvidia-bg: rgba(118, 185, 0, 0.15);
-  --accent-epic: #0078f2;
-  --accent-epic-bg: rgba(0, 120, 242, 0.15);
-  --accent-ubisoft: #8b5cf6;
-  --accent-ubisoft-bg: rgba(139, 92, 246, 0.15);
-  --accent-custom: #facc15;
-  --accent-custom-bg: rgba(250, 204, 21, 0.12);
+  /* Launcher Accents - Crisp Unique Brand Colors */
+  --accent-steam: #00c0f0;          /* Valve Steam Electric Cyan */
+  --accent-steam-bg: rgba(0, 192, 240, 0.15);
+  --accent-epic: #c084fc;           /* Epic Games Store Electric Purple / Violet */
+  --accent-epic-bg: rgba(192, 132, 252, 0.16);
+  --accent-ubisoft: #0070d1;        /* Ubisoft Deep Azure Blue */
+  --accent-ubisoft-bg: rgba(0, 112, 209, 0.16);
+  --accent-xbox: #107c10;           /* Microsoft Xbox Emerald Green */
+  --accent-xbox-bg: rgba(16, 124, 16, 0.16);
+  --accent-nvidia: #76b900;         /* NVIDIA Claw Lime Green */
+  --accent-nvidia-bg: rgba(118, 185, 0, 0.16);
+  --accent-custom: #f59e0b;         /* Sentinel Vault Amber Gold */
+  --accent-custom-bg: rgba(245, 158, 11, 0.15);
 
   /* Global UI Accents */
   --accent-primary: #facc15; /* Signature Gold */

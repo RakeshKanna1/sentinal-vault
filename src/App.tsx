@@ -28,12 +28,12 @@ interface CredentialItem {
 }
 
 export const PLATFORM_SELECT_OPTIONS = [
-  { id: 'steam', label: 'Steam', color: '#1a9fff', bg: 'rgba(26, 159, 255, 0.16)', Icon: SteamIcon },
-  { id: 'epic', label: 'Epic Games', color: '#0078f2', bg: 'rgba(0, 120, 242, 0.16)', Icon: EpicGamesIcon },
-  { id: 'ubisoft', label: 'Ubisoft', color: '#00a2ff', bg: 'rgba(0, 162, 255, 0.16)', Icon: UbisoftIcon },
+  { id: 'steam', label: 'Steam', color: '#00c0f0', bg: 'rgba(0, 192, 240, 0.15)', Icon: SteamIcon },
+  { id: 'epic', label: 'Epic Games', color: '#c084fc', bg: 'rgba(192, 132, 252, 0.16)', Icon: EpicGamesIcon },
+  { id: 'ubisoft', label: 'Ubisoft', color: '#0070d1', bg: 'rgba(0, 112, 209, 0.16)', Icon: UbisoftIcon },
   { id: 'xbox', label: 'Xbox', color: '#107c10', bg: 'rgba(16, 124, 16, 0.16)', Icon: XboxIcon },
   { id: 'nvidia', label: 'Nvidia', color: '#76b900', bg: 'rgba(118, 185, 0, 0.16)', Icon: NvidiaIcon },
-  { id: 'custom', label: 'Custom', color: '#facc15', bg: 'rgba(250, 204, 21, 0.14)', Icon: Shield },
+  { id: 'custom', label: 'Custom', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.15)', Icon: Shield },
 ];
 
 export const DEFAULT_VAULT_ITEMS = [
@@ -1612,37 +1612,49 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
                 <button 
                   className={`category-tab interactive ${activeTab === 'steam' ? 'active' : ''}`}
                   onClick={() => setActiveTab('steam')}
+                  style={activeTab === 'steam' ? { borderColor: '#00c0f0', color: '#00c0f0' } : {}}
                 >
+                  <SteamIcon size={14} style={{ color: activeTab === 'steam' ? '#00c0f0' : '#858d9d' }} />
                   <HoverScrambleText text="STEAM" />
+                </button>
+                <button 
+                  className={`category-tab interactive ${activeTab === 'epic' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('epic')}
+                  style={activeTab === 'epic' ? { borderColor: '#c084fc', color: '#c084fc' } : {}}
+                >
+                  <EpicGamesIcon size={14} style={{ color: activeTab === 'epic' ? '#c084fc' : '#858d9d' }} />
+                  <HoverScrambleText text="EPIC GAMES" />
                 </button>
                 <button 
                   className={`category-tab interactive ${activeTab === 'xbox' ? 'active' : ''}`}
                   onClick={() => setActiveTab('xbox')}
+                  style={activeTab === 'xbox' ? { borderColor: '#107c10', color: '#107c10' } : {}}
                 >
+                  <XboxIcon size={14} style={{ color: activeTab === 'xbox' ? '#107c10' : '#858d9d' }} />
                   <HoverScrambleText text="XBOX" />
                 </button>
                 <button 
                   className={`category-tab interactive ${activeTab === 'nvidia' ? 'active' : ''}`}
                   onClick={() => setActiveTab('nvidia')}
+                  style={activeTab === 'nvidia' ? { borderColor: '#76b900', color: '#76b900' } : {}}
                 >
+                  <NvidiaIcon size={14} style={{ color: activeTab === 'nvidia' ? '#76b900' : '#858d9d' }} />
                   <HoverScrambleText text="NVIDIA" />
-                </button>
-                <button 
-                  className={`category-tab interactive ${activeTab === 'epic' ? 'active' : ''}`}
-                  onClick={() => setActiveTab('epic')}
-                >
-                  <HoverScrambleText text="EPIC GAMES" />
                 </button>
                 <button 
                   className={`category-tab interactive ${activeTab === 'ubisoft' ? 'active' : ''}`}
                   onClick={() => setActiveTab('ubisoft')}
+                  style={activeTab === 'ubisoft' ? { borderColor: '#0070d1', color: '#0070d1' } : {}}
                 >
+                  <UbisoftIcon size={14} style={{ color: activeTab === 'ubisoft' ? '#0070d1' : '#858d9d' }} />
                   <HoverScrambleText text="UBISOFT" />
                 </button>
                 <button 
                   className={`category-tab interactive ${activeTab === 'custom' ? 'active' : ''}`}
                   onClick={() => setActiveTab('custom')}
+                  style={activeTab === 'custom' ? { borderColor: '#f59e0b', color: '#f59e0b' } : {}}
                 >
+                  <Shield size={14} style={{ color: activeTab === 'custom' ? '#f59e0b' : '#858d9d' }} />
                   <HoverScrambleText text="CUSTOM" />
                 </button>
               </div>
