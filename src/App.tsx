@@ -1610,51 +1610,45 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
                   <HoverScrambleText text="ALL CREDENTIALS" />
                 </button>
                 <button 
-                  className={`category-tab interactive ${activeTab === 'steam' ? 'active' : ''}`}
+                  className={`category-tab tab-steam interactive ${activeTab === 'steam' ? 'active' : ''}`}
                   onClick={() => setActiveTab('steam')}
-                  style={activeTab === 'steam' ? { borderColor: '#00c0f0', color: '#00c0f0' } : {}}
                 >
-                  <SteamIcon size={14} style={{ color: activeTab === 'steam' ? '#00c0f0' : '#858d9d' }} />
+                  <SteamIcon size={15} />
                   <HoverScrambleText text="STEAM" />
                 </button>
                 <button 
-                  className={`category-tab interactive ${activeTab === 'epic' ? 'active' : ''}`}
+                  className={`category-tab tab-epic interactive ${activeTab === 'epic' ? 'active' : ''}`}
                   onClick={() => setActiveTab('epic')}
-                  style={activeTab === 'epic' ? { borderColor: '#c084fc', color: '#c084fc' } : {}}
                 >
-                  <EpicGamesIcon size={14} style={{ color: activeTab === 'epic' ? '#c084fc' : '#858d9d' }} />
+                  <EpicGamesIcon size={15} />
                   <HoverScrambleText text="EPIC GAMES" />
                 </button>
                 <button 
-                  className={`category-tab interactive ${activeTab === 'xbox' ? 'active' : ''}`}
+                  className={`category-tab tab-xbox interactive ${activeTab === 'xbox' ? 'active' : ''}`}
                   onClick={() => setActiveTab('xbox')}
-                  style={activeTab === 'xbox' ? { borderColor: '#107c10', color: '#107c10' } : {}}
                 >
-                  <XboxIcon size={14} style={{ color: activeTab === 'xbox' ? '#107c10' : '#858d9d' }} />
+                  <XboxIcon size={15} />
                   <HoverScrambleText text="XBOX" />
                 </button>
                 <button 
-                  className={`category-tab interactive ${activeTab === 'nvidia' ? 'active' : ''}`}
+                  className={`category-tab tab-nvidia interactive ${activeTab === 'nvidia' ? 'active' : ''}`}
                   onClick={() => setActiveTab('nvidia')}
-                  style={activeTab === 'nvidia' ? { borderColor: '#76b900', color: '#76b900' } : {}}
                 >
-                  <NvidiaIcon size={14} style={{ color: activeTab === 'nvidia' ? '#76b900' : '#858d9d' }} />
+                  <NvidiaIcon size={15} />
                   <HoverScrambleText text="NVIDIA" />
                 </button>
                 <button 
-                  className={`category-tab interactive ${activeTab === 'ubisoft' ? 'active' : ''}`}
+                  className={`category-tab tab-ubisoft interactive ${activeTab === 'ubisoft' ? 'active' : ''}`}
                   onClick={() => setActiveTab('ubisoft')}
-                  style={activeTab === 'ubisoft' ? { borderColor: '#0070d1', color: '#0070d1' } : {}}
                 >
-                  <UbisoftIcon size={14} style={{ color: activeTab === 'ubisoft' ? '#0070d1' : '#858d9d' }} />
+                  <UbisoftIcon size={15} />
                   <HoverScrambleText text="UBISOFT" />
                 </button>
                 <button 
-                  className={`category-tab interactive ${activeTab === 'custom' ? 'active' : ''}`}
+                  className={`category-tab tab-custom interactive ${activeTab === 'custom' ? 'active' : ''}`}
                   onClick={() => setActiveTab('custom')}
-                  style={activeTab === 'custom' ? { borderColor: '#f59e0b', color: '#f59e0b' } : {}}
                 >
-                  <Shield size={14} style={{ color: activeTab === 'custom' ? '#f59e0b' : '#858d9d' }} />
+                  <Shield size={15} />
                   <HoverScrambleText text="CUSTOM" />
                 </button>
               </div>

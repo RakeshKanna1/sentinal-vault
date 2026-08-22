@@ -41,7 +41,7 @@ export const XboxIcon: React.FC<IconProps> = ({ size = 16, className = "", style
     width={size} 
     height={size} 
     className={className} 
-    style={{ width: `${size}px`, height: `${size}px`, objectFit: 'contain', display: 'inline-block', verticalAlign: 'middle', flexShrink: 0, ...style }} 
+    style={{ width: `${size}px`, height: `${size}px`, objectFit: 'contain', display: 'inline-block', verticalAlign: 'middle', filter: 'brightness(0) invert(1)', flexShrink: 0, ...style }} 
   />
 );
 
