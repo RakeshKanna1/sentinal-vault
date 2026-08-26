@@ -309,9 +309,53 @@ export default function App() {
   const [cursorPos, setCursorPos] = useState({ x: -100, y: -100 });
   const [followerPos, setFollowerPos] = useState({ x: -100, y: -100 });
 
-  // Refs for tracking mouse
+  // Refs for tracking mouse & search
   const requestRef = useRef<number | null>(null);
   const mousePos = useRef({ x: -100, y: -100 });
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
+  const idleTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Auto-Lock after 15 minutes of inactivity for maximum vault security
+  useEffect(() => {
+    if (!isUnlocked) return;
+
+    const resetIdleTimer = () => {
+      if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+      idleTimerRef.current = setTimeout(() => {
+        handleLockVault();
+        triggerNotification('Vault auto-locked due to inactivity.');
+      }, 15 * 60 * 1000); // 15 minutes
+    };
+
+    resetIdleTimer();
+
+    const activityEvents = ['mousedown', 'mousemove', 'keydown', 'touchstart', 'scroll'];
+    activityEvents.forEach((ev) => window.addEventListener(ev, resetIdleTimer, { passive: true }));
+
+    return () => {
+      if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+      activityEvents.forEach((ev) => window.removeEventListener(ev, resetIdleTimer));
+    };
+  }, [isUnlocked]);
+
+  // Global Keyboard Shortcuts (Ctrl+K / / to Search, Esc to close modals)
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+        return;
+      }
+      if (e.key === 'Escape') {
+        setShowAddModal(false);
+        setShowEditModal(false);
+        setShowGuideModal(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, []);
 
   // Initialize and check local storage & pointer capability
   useEffect(() => {
@@ -936,20 +980,27 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
     return ['General PC Games', 'Vault Account'];
   };
 
-  // Live Supabase Realtime Sync across PC & Mobile
+  // Live Supabase Realtime Sync across PC & Mobile (DB as Single Source of Truth)
   const syncWithSupabase = async () => {
     try {
-      const { data } = await supabase.from('sentinel_vault').select('*').order('updated_at', { ascending: false });
+      const { data, error } = await supabase.from('sentinel_vault').select('*').order('updated_at', { ascending: false });
+      if (error) {
+        console.error("Supabase select error:", error);
+        return;
+      }
+
       const dedupMap = new Map<string, CredentialItem>();
 
       if (data && data.length > 0) {
+        // If DB has records, DB is the absolute source of truth!
         data.forEach((item: any) => {
-          const key = item.platform.trim().toLowerCase();
+          const key = (item.platform || '').trim().toLowerCase();
+          const itemId = String(item.id);
           if (!dedupMap.has(key)) {
             dedupMap.set(key, {
-              id: String(item.id),
-              platform: item.platform,
-              username: item.username,
+              id: itemId,
+              platform: item.platform || 'Custom Launcher',
+              username: item.username || '',
               passwordEncrypted: item.password || '',
               notesEncrypted: item.notes || '',
               category: (item.category as any) || 'custom',
@@ -959,34 +1010,34 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
             });
           }
         });
-      }
+      } else {
+        // Only seed defaults if database is 100% empty (Brand new setup)
+        for (const def of DEFAULT_VAULT_ITEMS) {
+          const key = def.platform.trim().toLowerCase();
+          if (!dedupMap.has(key)) {
+            dedupMap.set(key, {
+              id: def.id,
+              platform: def.platform,
+              username: def.username,
+              passwordEncrypted: def.password,
+              notesEncrypted: def.notes,
+              gamesList: def.gamesList,
+              category: def.category,
+              strength: checkPasswordStrength(def.password),
+              updatedAt: new Date().toLocaleDateString()
+            });
 
-      // Merge all 11 default accounts if missing from cloud
-      for (const def of DEFAULT_VAULT_ITEMS) {
-        const key = def.platform.trim().toLowerCase();
-        if (!dedupMap.has(key)) {
-          dedupMap.set(key, {
-            id: def.id,
-            platform: def.platform,
-            username: def.username,
-            passwordEncrypted: def.password,
-            notesEncrypted: def.notes,
-            gamesList: def.gamesList,
-            category: def.category,
-            strength: checkPasswordStrength(def.password),
-            updatedAt: new Date().toLocaleDateString()
-          });
-
-          // Upload missing default item to Supabase in background
-          supabase.from('sentinel_vault').upsert({
-            platform: def.platform,
-            username: def.username,
-            password: def.password,
-            notes: def.notes,
-            category: def.category,
-            games_included: def.gamesList.join(', '),
-            updated_at: new Date().toISOString()
-          }).then(() => {}).catch(() => {});
+            // Seed initial row to cloud
+            void supabase.from('sentinel_vault').insert({
+              platform: def.platform,
+              username: def.username,
+              password: def.password,
+              notes: def.notes,
+              category: def.category,
+              games_included: (def.gamesList || []).join(', '),
+              updated_at: new Date().toISOString()
+            });
+          }
         }
       }
 
@@ -1021,17 +1072,17 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
 
   useEffect(() => {
     if (isUnlocked) {
-      syncWithSupabase();
+      void syncWithSupabase();
 
-      // Poll cloud every 3 seconds for instant PC & Mobile sync
+      // Poll cloud every 5 seconds for background sync
       const pollInterval = setInterval(() => {
-        syncWithSupabase();
-      }, 3000);
+        void syncWithSupabase();
+      }, 5000);
 
       const channel = supabase
         .channel('sentinel_vault_live_app')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'sentinel_vault' }, () => {
-          syncWithSupabase();
+          void syncWithSupabase();
         })
         .subscribe();
 
@@ -1118,12 +1169,31 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
       const passEnc = formPassword;
       const notesEnc = formNotes || 'No notes saved.';
       const gamesParsed = formGames ? formGames.split(',').map(g => g.trim()).filter(Boolean) : undefined;
-      const newId = Date.now().toString();
+      let newId = Date.now().toString();
+
+      // Push to Supabase Cloud live first
+      try {
+        const { data: inserted, error: insErr } = await supabase.from('sentinel_vault').insert({
+          platform: formPlatform.trim(),
+          username: formUsername.trim(),
+          password: formPassword,
+          notes: notesEnc,
+          category: formCategory,
+          games_included: formGames || '',
+          updated_at: new Date().toISOString()
+        }).select('id');
+
+        if (!insErr && inserted && inserted.length > 0) {
+          newId = String(inserted[0].id);
+        }
+      } catch (sbErr) {
+        console.error("Supabase insert error:", sbErr);
+      }
 
       const newItem: CredentialItem = {
         id: newId,
-        platform: formPlatform,
-        username: formUsername,
+        platform: formPlatform.trim(),
+        username: formUsername.trim(),
         passwordEncrypted: passEnc,
         notesEncrypted: notesEnc,
         gamesList: gamesParsed,
@@ -1135,21 +1205,6 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
       const updatedList = [...vaultItems, newItem];
       setVaultItems(updatedList);
       localStorage.setItem('sentinel_vault_items', JSON.stringify(updatedList));
-
-      // Push to Supabase Cloud live
-      try {
-        await supabase.from('sentinel_vault').upsert({
-          platform: formPlatform,
-          username: formUsername,
-          password: formPassword,
-          notes: formNotes || 'No notes saved.',
-          category: formCategory,
-          games_included: formGames || '',
-          updated_at: new Date().toISOString()
-        });
-      } catch (sbErr) {
-        console.error("Supabase upsert error:", sbErr);
-      }
 
       const platKey = formPlatform.trim().toLowerCase();
       setDecryptedPasswords(prev => ({ ...prev, [newId]: formPassword, [platKey]: formPassword }));
@@ -1215,8 +1270,8 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
         if (item.id === editingItem.id || item.platform.trim().toLowerCase() === editingItem.platform.trim().toLowerCase()) {
           return {
             ...item,
-            platform: formPlatform,
-            username: formUsername,
+            platform: formPlatform.trim(),
+            username: formUsername.trim(),
             passwordEncrypted: passEnc,
             notesEncrypted: notesEnc,
             gamesList: gamesParsed,
@@ -1231,77 +1286,97 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
       setVaultItems(updatedList);
       localStorage.setItem('sentinel_vault_items', JSON.stringify(updatedList));
 
-      // Push to Supabase Cloud live
+      // Push update to Supabase Cloud
       try {
-        const matchPlatform = editingItem.platform || formPlatform;
-        const { data: existing } = await supabase.from('sentinel_vault').select('id').eq('platform', matchPlatform);
-        if (existing && existing.length > 0) {
+        const isNumericId = !isNaN(Number(editingItem.id));
+        if (isNumericId) {
           await supabase.from('sentinel_vault').update({
-            platform: formPlatform,
-            username: formUsername,
+            platform: formPlatform.trim(),
+            username: formUsername.trim(),
             password: formPassword,
             notes: formNotes || '',
             category: formCategory,
             games_included: formGames || '',
             updated_at: new Date().toISOString()
-          }).eq('id', existing[0].id);
+          }).eq('id', Number(editingItem.id));
         } else {
-          await supabase.from('sentinel_vault').upsert({
-            platform: formPlatform,
-            username: formUsername,
-            password: formPassword,
-            notes: formNotes || '',
-            category: formCategory,
-            games_included: formGames || '',
-            updated_at: new Date().toISOString()
-          }, { onConflict: 'platform' });
+          // Fallback match by platform name case-insensitively
+          const { data: existing } = await supabase.from('sentinel_vault').select('id, platform');
+          const matched = (existing || []).find((row: any) => 
+            (row.platform || '').trim().toLowerCase() === editingItem.platform.trim().toLowerCase()
+          );
+
+          if (matched) {
+            await supabase.from('sentinel_vault').update({
+              platform: formPlatform.trim(),
+              username: formUsername.trim(),
+              password: formPassword,
+              notes: formNotes || '',
+              category: formCategory,
+              games_included: formGames || '',
+              updated_at: new Date().toISOString()
+            }).eq('id', matched.id);
+          } else {
+            await supabase.from('sentinel_vault').insert({
+              platform: formPlatform.trim(),
+              username: formUsername.trim(),
+              password: formPassword,
+              notes: formNotes || '',
+              category: formCategory,
+              games_included: formGames || '',
+              updated_at: new Date().toISOString()
+            });
+          }
         }
       } catch (sbErr) {
         console.error("Supabase update error:", sbErr);
       }
 
       const platKey = formPlatform.trim().toLowerCase();
+      const oldPlatKey = editingItem.platform.trim().toLowerCase();
       setDecryptedPasswords(prev => ({ 
         ...prev, 
         [editingItem.id]: formPassword,
-        [platKey]: formPassword 
+        [platKey]: formPassword,
+        [oldPlatKey]: formPassword
       }));
       setDecryptedNotes(prev => ({ 
         ...prev, 
         [editingItem.id]: formNotes,
-        [platKey]: formNotes 
-      }));
-      setRevealedItems(prev => ({ 
-        ...prev, 
-        [editingItem.id]: true,
-        [platKey]: true 
+        [platKey]: formNotes,
+        [oldPlatKey]: formNotes
       }));
 
-      // Reset
-      setEditingItem(null);
-      setFormPlatform('');
-      setFormUsername('');
-      setFormPassword('');
-      setFormNotes('');
-      setFormGames('');
       setShowEditModal(false);
-      triggerNotification('Gamer Key Updated & Cloud Synced ⚡');
+      setEditingItem(null);
+      triggerNotification('Changes Saved & Synced to Database ⚡');
     } catch (err) {
-      triggerNotification('Failed to save changes.');
+      triggerNotification('Failed to update.');
     }
   };
 
   // Delete item
   const handleDeleteItem = async (id: string) => {
-    const target = vaultItems.find(item => item.id === id);
-    if (confirm('Are you sure you want to delete this launcher key?')) {
+    if (window.confirm('Are you sure you want to permanently delete this launcher credential?')) {
+      const target = vaultItems.find(item => item.id === id);
       const updatedList = vaultItems.filter(item => item.id !== id);
       setVaultItems(updatedList);
       localStorage.setItem('sentinel_vault_items', JSON.stringify(updatedList));
 
       if (target) {
         try {
-          await supabase.from('sentinel_vault').delete().eq('platform', target.platform);
+          const isNumericId = !isNaN(Number(target.id));
+          if (isNumericId) {
+            await supabase.from('sentinel_vault').delete().eq('id', Number(target.id));
+          } else {
+            const { data: existing } = await supabase.from('sentinel_vault').select('id, platform');
+            const matched = (existing || []).find((row: any) => 
+              (row.platform || '').trim().toLowerCase() === target.platform.trim().toLowerCase()
+            );
+            if (matched) {
+              await supabase.from('sentinel_vault').delete().eq('id', matched.id);
+            }
+          }
         } catch (sbErr) {
           console.error("Supabase delete error:", sbErr);
         }
@@ -1568,12 +1643,22 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
                 <div className="search-wrapper">
                   <Search size={18} className="search-icon" />
                   <input 
+                    ref={searchInputRef}
                     type="text" 
-                    placeholder="SEARCH SECURED LAUNCHERS..."
+                    placeholder="SEARCH SECURED LAUNCHERS (Ctrl+K)..." 
                     className="search-input"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
+                  {searchQuery && (
+                    <button 
+                      onClick={() => setSearchQuery('')}
+                      style={{ background: 'transparent', border: 'none', color: '#888', cursor: 'pointer', padding: '0 8px' }}
+                      title="Clear search"
+                    >
+                      <X size={14} />
+                    </button>
+                  )}
                 </div>
 
                 <div className="hub-actions">
