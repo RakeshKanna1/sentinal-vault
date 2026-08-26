@@ -37,17 +37,17 @@ export const PLATFORM_SELECT_OPTIONS = [
 ];
 
 export const DEFAULT_VAULT_ITEMS = [
-  { id: '1', platform: 'RAKEJINWO', username: 'jinwosung2', password: 'Rakesh@111', notes: 'Imported launcher credential.', gamesList: ['Solo Leveling Arise', 'RPG Launchers', 'Ac Shadows', 'cricket 24', 'palworld', 'ETS2', 'Fc25', 'Fc26', 'REvillage', 'watch dogs 2'], category: 'custom' as const },
-  { id: '2', platform: 'RAKEGENERAL', username: 'rake_general', password: 'Rakesh@111', notes: 'General gaming account credential.', gamesList: ['Far cry 4', 'just cause 3', 'rise of tomb', 'Ark Survival evolved', 'Tekken 7', 'cars for sale', 'hitman absolution', 'witcher 1 2 3'], category: 'steam' as const },
-  { id: '3', platform: 'ROCKSTAR - STEAM', username: 'Rake_Rockstar', password: 'Rakesh@111', notes: 'Rockstar Games Social Club / Steam integration.', gamesList: ['GTA V', 'Red Dead Redemption 2', 'Max Payne 3'], category: 'steam' as const },
-  { id: '4', platform: 'EPIC GAMES', username: 'cheappcgamesrake@gmail.com', password: 'Rakesh@114', notes: 'Epic Games Store official email login.', gamesList: ['Fortnite', 'GTA V', 'RDR2', 'Hogwarts legacy', 'dead space 3'], category: 'epic' as const },
-  { id: '5', platform: 'RAKEXURA CRIC', username: 'Rakexura_cric', password: 'rakexura@112', notes: 'Cricket / sports gaming portal.', gamesList: ['Cricket 24', 'EA Sports Cricket', 'Cricket 19'], category: 'custom' as const },
-  { id: '6', platform: 'RAKEXURA MAFIA AND HITMAN', username: 'rake_hitman', password: 'Rakesh@111', notes: 'Steam launcher keys for Mafia and Hitman collections.', gamesList: ['Hitman 3', 'Hitman World of Assassination', 'Mafia Definitive Edition', 'Mafia II', 'Mafia III'], category: 'steam' as const },
-  { id: '7', platform: 'RAKEXURA FH6', username: 'rakexura_fh6', password: 'rakexura@111', notes: 'Xbox Live / Forza Horizon account.', gamesList: ['Forza Horizon 5', 'Forza Horizon 4', 'Xbox Live'], category: 'xbox' as const },
-  { id: '8', platform: 'Nvidia Geforce Now', username: '12k21rakeshkannam@gmail.com', password: 'Rakesh@111', notes: 'Nvidia GeForce NOW Cloud Gaming account.', gamesList: ['GeForce NOW Cloud Portal'], category: 'nvidia' as const },
-  { id: '9', platform: 'Steam - Rake_Meccha', username: 'Rake_Meccha', password: 'Rakesh@111', notes: 'Steam library and launcher credentials.', gamesList: ['Cyberpunk 2077', 'The Witcher 3', 'Meccha chameleon', 'Steam Main Library'], category: 'steam' as const },
+  { id: '1', platform: 'EPIC GAMES', username: 'cheappcgamesrake@gmail.com', password: 'Rakesh@114', notes: 'Epic Games Store official email login.', gamesList: ['Fortnite', 'GTA V', 'RDR2', 'Hogwarts legacy', 'dead space 3'], category: 'epic' as const },
+  { id: '2', platform: 'Steam - Rake_Meccha', username: 'Rake_Meccha', password: 'Rakesh@111', notes: 'Steam library and launcher credentials.', gamesList: ['Meccha chameleon', 'Cyberpunk 2077', 'The Witcher 3'], category: 'steam' as const },
+  { id: '3', platform: 'Nvidia Geforce Now', username: '12k21rakeshkannam@gmail.com', password: 'Rakesh@111', notes: 'Nvidia GeForce NOW Cloud Gaming account.', gamesList: ['GeForce NOW Cloud Portal'], category: 'nvidia' as const },
+  { id: '4', platform: 'UBISOFT CONNECT', username: '12k21rakeshkannam@gmail.com', password: 'Rakesh@111', notes: 'Ubisoft Connect official account credentials.', gamesList: ['Assassin\'s Creed Shadows', 'Far Cry 6', 'Watch Dogs Legion', 'Rainbow Six Siege'], category: 'ubisoft' as const },
+  { id: '5', platform: 'RAKEJINWO', username: 'jinwosung2', password: 'Rakesh@111', notes: 'Imported launcher credential.', gamesList: ['Solo Leveling Arise', 'RPG Launchers', 'Ac Shadows', 'cricket 24', 'palworld', 'ETS2', 'Fc25', 'Fc26', 'REvillage', 'watch dogs 2'], category: 'steam' as const },
+  { id: '6', platform: 'RAKEGENERAL', username: 'rake_general', password: '93n3r4l_R493Qu17_6560?', notes: 'General gaming account credential.', gamesList: ['Far cry 4', 'just cause 3', 'rise of tomb', 'Ark Survival evolved', 'Tekken 7', 'cars for sale', 'hitman absolution', 'witcher 1 2 3'], category: 'steam' as const },
+  { id: '7', platform: 'RAKEXURA CRIC', username: 'Rakexura_cric', password: 'rakexura@112', notes: 'Cricket / sports gaming portal.', gamesList: ['Cricket 19', 'Cricket 24', 'EA Sports Cricket'], category: 'steam' as const },
+  { id: '8', platform: 'RAKEXURA MAFIA AND HITMAN', username: 'rake_hitman', password: 'Rakesh@111', notes: 'Steam launcher keys for Mafia and Hitman collections.', gamesList: ['Hitman 3', 'Hitman World of Assassination', 'Mafia Definitive Edition', 'Mafia II', 'Mafia III'], category: 'steam' as const },
+  { id: '9', platform: 'RAKEXURA FH6', username: 'rakexura_fh6', password: 'rakexura@111', notes: 'Xbox Live / Forza Horizon account.', gamesList: ['Forza Horizon 5', 'Forza Horizon 4', 'Xbox Live'], category: 'steam' as const },
   { id: '10', platform: 'Xbox Live', username: '12k21rakeshkannam@gmail.com', password: 'Rakesh@111', notes: 'Xbox Pass and Microsoft Store gaming account.', gamesList: ['Halo Infinite', 'Minecraft', 'Gears 5', 'Xbox Game Pass'], category: 'xbox' as const },
-  { id: '11', platform: 'UBISOFT CONNECT', username: '12k21rakeshkannam@gmail.com', password: 'Rakesh@111', notes: 'Ubisoft Connect official account credentials.', gamesList: ['Assassin\'s Creed Shadows', 'Far Cry 6', 'Watch Dogs Legion', 'Rainbow Six Siege'], category: 'ubisoft' as const }
+  { id: '11', platform: 'ROCKSTAR - STEAM', username: 'Rake_Rockstar', password: 'Rakesh@111', notes: 'Rockstar Games Social Club / Steam integration.', gamesList: ['GTA V', 'Red Dead Redemption 2', 'Max Payne 3'], category: 'steam' as const }
 ];
 
 // Scramble Text Component for Cyberpunk Decrypt Effect
@@ -821,23 +821,9 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
       const authVerifyToken = await encryptText('sentinel_vault_auth_verified', masterPassword);
       localStorage.setItem('sentinel_vault_auth_token', authVerifyToken);
 
-      // Create defaults from user text file (All 10 gamer-vault items with games)
-      const defaultItemsRaw = [
-        { id: '1', platform: 'RAKEJINWO', username: 'jinwosung2', password: 'Rakesh@111', notes: 'Imported launcher credential.', gamesList: ['Solo Leveling Arise', 'RPG Launchers'], category: 'custom' },
-        { id: '2', platform: 'RAKEGENERAL', username: 'rake_general', password: 'Rakesh@111', notes: 'General gaming account credential.', gamesList: ['General PC Games', 'Indie Vault'], category: 'custom' },
-        { id: '3', platform: 'ROCKSTAR - STEAM', username: 'Rake_Rockstar', password: 'Rakesh@111', notes: 'Rockstar Games Social Club / Steam integration.', gamesList: ['GTA V', 'Red Dead Redemption 2', 'Max Payne 3'], category: 'steam' },
-        { id: '4', platform: 'EPIC GAMES', username: 'cheappcgamesrake@gmail.com', password: 'Rakesh@114', notes: 'Epic Games Store official email login.', gamesList: ['Fortnite', 'Epic Games Store Library'], category: 'epic' },
-        { id: '5', platform: 'RAKEXURA CRIC', username: 'Rakexura_cric', password: 'rakexura@112', notes: 'Cricket / sports gaming portal.', gamesList: ['Cricket 24', 'EA Sports Cricket'], category: 'custom' },
-        { id: '6', platform: 'RAKEXURA MAFIA AND HITMAN', username: 'rake_hitman', password: 'Rakesh@111', notes: 'Steam launcher keys for Mafia and Hitman collections.', gamesList: ['Hitman 3', 'Hitman World of Assassination', 'Mafia Definitive Edition', 'Mafia II', 'Mafia III'], category: 'steam' },
-        { id: '7', platform: 'RAKEXURA FH6', username: 'rakexura_fh6', password: 'rakexura@111', notes: 'Xbox Live / Forza Horizon account.', gamesList: ['Forza Horizon 5', 'Forza Horizon 4', 'Xbox Live'], category: 'xbox' },
-        { id: '8', platform: 'Nvidia Geforce Now', username: '12k21rakeshkannam@gmail.com', password: 'Rakesh@111', notes: 'Nvidia GeForce NOW Cloud Gaming account.', gamesList: ['GeForce NOW Cloud Portal'], category: 'nvidia' },
-        { id: '9', platform: 'Steam - Rake_Meccha', username: 'Rake_Meccha', password: 'Rakesh@111', notes: 'Steam library and launcher credentials.', gamesList: ['Cyberpunk 2077', 'The Witcher 3', 'Steam Main Library'], category: 'steam' },
-        { id: '10', platform: 'Xbox Live', username: '12k21rakeshkannam@gmail.com', password: 'Rakesh@111', notes: 'Xbox Pass and Microsoft Store gaming account.', gamesList: ['Halo Infinite', 'Minecraft', 'Gears 5', 'Xbox Game Pass'], category: 'xbox' },
-        { id: '11', platform: 'UBISOFT CONNECT', username: '12k21rakeshkannam@gmail.com', password: 'Rakesh@111', notes: 'Ubisoft Connect official account credentials.', gamesList: ['Assassin\'s Creed Shadows', 'Far Cry 6', 'Watch Dogs Legion', 'Rainbow Six Siege'], category: 'ubisoft' }
-      ];
-
+      // Create defaults directly from verified master items
       const encryptedItems: CredentialItem[] = [];
-      for (const item of defaultItemsRaw) {
+      for (const item of DEFAULT_VAULT_ITEMS) {
         const passEnc = await encryptText(item.password, masterPassword);
         const notesEnc = await encryptText(item.notes, masterPassword);
         encryptedItems.push({
