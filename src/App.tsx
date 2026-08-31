@@ -1495,7 +1495,11 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
                 onChange={(e) => setMasterPassword(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
-                    isInitialized ? handleUnlockVault() : handleInitializeVault();
+                    if (isInitialized) {
+                      handleUnlockVault();
+                    } else {
+                      handleInitializeVault();
+                    }
                   }
                 }}
               />
