@@ -192,14 +192,28 @@ const ParticleBackground: React.FC = () => {
         }
       });
       
-      animationFrameId = requestAnimationFrame(animate);
+      if (!document.hidden) {
+        animationFrameId = requestAnimationFrame(animate);
+      }
     };
     
-    animate();
+    animationFrameId = requestAnimationFrame(animate);
+
+    const handleVisibility = () => {
+      if (document.hidden) {
+        cancelAnimationFrame(animationFrameId);
+      } else {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = requestAnimationFrame(animate);
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibility);
     
     return () => {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('visibilitychange', handleVisibility);
       cancelAnimationFrame(animationFrameId);
     };
   }, []);
@@ -1060,10 +1074,10 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
     if (isUnlocked) {
       void syncWithSupabase();
 
-      // Poll cloud every 5 seconds for background sync
+      // Background fallback poll every 30s (Realtime postgres_changes handles instant sync)
       const pollInterval = setInterval(() => {
         void syncWithSupabase();
-      }, 5000);
+      }, 30000);
 
       const channel = supabase
         .channel('sentinel_vault_live_app')
@@ -1576,6 +1590,23 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
                 </span>
               </button>
 
+              <div 
+                className="status-capsule"
+                style={{
+                  background: 'rgba(0, 214, 143, 0.08)',
+                  borderColor: 'rgba(0, 214, 143, 0.25)',
+                  color: '#70efbb',
+                  fontSize: '11px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+                title="Live real-time sync with Supabase cloud database"
+              >
+                <div className="pulse-dot" style={{ backgroundColor: '#00d68f', boxShadow: '0 0 8px #00d68f' }}></div>
+                <span>CLOUD_SYNC</span>
+              </div>
+
               <div className="status-capsule">
                 <div className="pulse-dot"></div>
                 <span>DECRYPTED_SESSION</span>
@@ -1948,7 +1979,23 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
                 <div className="empty-state">
                   <ShieldAlert size={48} style={{ color: 'var(--color-text-dim)', marginBottom: '16px' }} />
                   <h3 className="empty-title">NO VAULT SECURED KEYS FOUND</h3>
-                  <p className="empty-subtitle">Create a new secure game launcher key or import your backup JSON to begin.</p>
+                  <p className="empty-subtitle">
+                    {searchQuery ? `No credentials found matching "${searchQuery}".` : "Create a new secure game launcher key or import your backup JSON to begin."}
+                  </p>
+                  {searchQuery && (
+                    <button
+                      className="btn-primary interactive"
+                      style={{ marginTop: '16px', display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 20px', fontSize: '12px' }}
+                      onClick={() => {
+                        setFormPlatform(searchQuery.trim().toUpperCase());
+                        setFormGames(searchQuery.trim());
+                        setShowAddModal(true);
+                      }}
+                    >
+                      <Plus size={16} />
+                      <span>REGISTER KEY FOR "{searchQuery.toUpperCase()}"</span>
+                    </button>
+                  )}
                 </div>
               ) : (
                 filteredItems.map((item) => {
