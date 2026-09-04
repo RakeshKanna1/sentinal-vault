@@ -3,10 +3,16 @@ import {
   Lock, Eye, EyeOff, Copy, Plus, Search, 
   Trash2, Edit3, RefreshCw, 
   Download, Upload, X, Check, ShieldAlert, Gamepad2, Laptop,
-  FileText, Fingerprint, Shield
+  FileText, Fingerprint, Shield, User, Sparkles
 } from 'lucide-react';
 import { encryptText, decryptText } from './utils/crypto';
-import { generatePasswordsFromGame } from './utils/gamePasswordGenerator';
+import { 
+  generatePasswordsFromGame, 
+  generateUsernamesFromGame, 
+  quickSuggestRakeUsername,
+  type SuggestedPasswords, 
+  type SuggestedUsernames 
+} from './utils/gamePasswordGenerator';
 import { SentinelLogo } from './components/SentinelLogo';
 import { SteamIcon, EpicGamesIcon, UbisoftIcon, XboxIcon, NvidiaIcon, getPlatformIcon } from './components/PlatformIcons';
 // @ts-ignore
@@ -301,14 +307,12 @@ export default function App() {
   const [genSymbols, setGenSymbols] = useState(true);
   const [generatedPassword, setGeneratedPassword] = useState('');
 
-  // Game-themed Password Generator States
+  // Game-themed Password & Rake Username Generator States
   const [generatorMode, setGeneratorMode] = useState<'standard' | 'game'>('standard');
   const [gameNameInput, setGameNameInput] = useState('');
-  const [gamePasswordSuggestions, setGamePasswordSuggestions] = useState<{
-    loreBased: string;
-    leetStyle: string;
-    stealthShort: string;
-  } | null>(null);
+  const [gamePasswordSuggestions, setGamePasswordSuggestions] = useState<SuggestedPasswords | null>(null);
+  const [gameUsernameSuggestions, setGameUsernameSuggestions] = useState<SuggestedUsernames | null>(null);
+  const [selectedSuggestedUsername, setSelectedSuggestedUsername] = useState<string>('');
 
 
   // Notification Banner State
@@ -618,22 +622,37 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
     setGeneratedPassword(result);
   };
 
-  // Generate game-themed passwords
+  // Generate game-themed passwords and Rake usernames
   const handleGenerateGamePasswords = () => {
     if (!gameNameInput.trim()) {
       triggerNotification('Please enter a game name!');
       return;
     }
-    const suggestions = generatePasswordsFromGame(gameNameInput);
-    setGamePasswordSuggestions(suggestions);
-    triggerNotification(`Suggested passwords generated for ${gameNameInput}!`);
+    const passSuggestions = generatePasswordsFromGame(gameNameInput);
+    const userSuggestions = generateUsernamesFromGame(gameNameInput);
+    setGamePasswordSuggestions(passSuggestions);
+    setGameUsernameSuggestions(userSuggestions);
+    setSelectedSuggestedUsername(userSuggestions.rakeClassic);
+    triggerNotification(`Suggested Rake credentials generated for ${gameNameInput}!`);
   };
 
-  // Apply suggested password to Add modal
-  const handleApplyGamePassword = (pwd: string) => {
+  // Quick auto-suggest Rake username based on platform or game
+  const handleQuickSuggestUsername = () => {
+    const target = formPlatform || gameNameInput;
+    const suggested = quickSuggestRakeUsername(target);
+    setFormUsername(suggested);
+    triggerNotification(`Applied Rake username: ${suggested}`);
+  };
+
+  // Apply suggested password & username to Add modal
+  const handleApplyGamePassword = (pwd: string, usernameOverride?: string) => {
+    const userToApply = usernameOverride || selectedSuggestedUsername || (gameUsernameSuggestions ? gameUsernameSuggestions.rakeClassic : '');
     setFormPlatform(gameNameInput.trim().toUpperCase());
+    if (userToApply) {
+      setFormUsername(userToApply);
+    }
     setFormPassword(pwd);
-    setFormNotes(`Suggested password generated from game lore: "${gameNameInput.trim()}"`);
+    setFormNotes(`Suggested credentials generated from game lore: "${gameNameInput.trim()}"`);
     
     // Guess category from game name
     const lowerName = gameNameInput.toLowerCase();
@@ -645,12 +664,14 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
       setFormCategory('nvidia');
     } else if (lowerName.includes('epic') || lowerName.includes('fortnite') || lowerName.includes('unreal')) {
       setFormCategory('epic');
+    } else if (lowerName.includes('ubisoft') || lowerName.includes('assassin') || lowerName.includes('far cry') || lowerName.includes('watch dogs')) {
+      setFormCategory('ubisoft');
     } else {
       setFormCategory('custom');
     }
     
     setShowAddModal(true);
-    triggerNotification('Applied password to vault registry form.');
+    triggerNotification(userToApply ? `Applied ${userToApply} & password to registry form.` : 'Applied password to vault registry form.');
   };
 
   // Biometrics WebAuthn States & Methods
@@ -1857,7 +1878,7 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
                       <Gamepad2 size={16} className="game-input-icon" />
                       <input 
                         type="text" 
-                        placeholder="ENTER GAME NAME (e.g. Witcher 3, Cyberpunk, GTA 5...)" 
+                        placeholder="ENTER GAME NAME (e.g. Witcher 3, Cyberpunk, GTA 5, Hitman, Forza...)" 
                         className="game-input-field"
                         value={gameNameInput}
                         onChange={(e) => setGameNameInput(e.target.value)}
@@ -1868,102 +1889,181 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
                     </div>
                     <button className="btn-primary interactive" onClick={handleGenerateGamePasswords}>
                       <RefreshCw size={16} style={{ marginRight: '4px' }} />
-                      <HoverScrambleText text="SUGGEST PASSWORD" />
+                      <HoverScrambleText text="SUGGEST RAKE KEYS" />
                     </button>
                   </div>
 
+                  {/* 1. SUGGESTED USERNAMES (RAKEXURA SIGNATURE) */}
+                  {gameUsernameSuggestions && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                      <div className="suggestions-section-header">
+                        <div className="suggestions-section-tag">
+                          <User size={13} />
+                          <span>1. SUGGESTED USERNAME (RAKEXURA SIGNATURE)</span>
+                        </div>
+                        <span className="suggestions-section-hint">
+                          Click any IGN below to set as active username for new vault key
+                        </span>
+                      </div>
+
+                      <div className="suggestions-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))' }}>
+                        {[
+                          { type: 'Rake Classic', val: gameUsernameSuggestions.rakeClassic, desc: 'Brand Signature' },
+                          { type: 'Rakexura Tag', val: gameUsernameSuggestions.rakexuraTag, desc: 'Vault Slug Style' },
+                          { type: 'Lore Hybrid', val: gameUsernameSuggestions.loreHybrid, desc: 'Game Character' },
+                          { type: 'Stealth Rake', val: gameUsernameSuggestions.stealthRake, desc: 'Minimalist Tag' }
+                        ].map((u) => {
+                          const isSelected = selectedSuggestedUsername === u.val;
+                          return (
+                            <div 
+                              key={u.type}
+                              className={`username-card ${isSelected ? 'selected' : ''}`}
+                              onClick={() => {
+                                setSelectedSuggestedUsername(u.val);
+                                triggerNotification(`Active Key Username set to "${u.val}"`);
+                              }}
+                            >
+                              <div className="suggestion-card-header">
+                                <span className="suggestion-type" style={{ fontSize: '10px' }}>{u.type}</span>
+                                {isSelected ? (
+                                  <span className="username-selected-pill">
+                                    <Check size={10} /> ACTIVE KEY
+                                  </span>
+                                ) : (
+                                  <span style={{ fontSize: '9px', color: 'var(--color-text-dim)', fontFamily: 'var(--font-mono)' }}>
+                                    CLICK TO SELECT
+                                  </span>
+                                )}
+                              </div>
+                              <div className="suggestion-value-box" style={{ padding: '8px 12px' }}>
+                                <span className="suggestion-val" style={{ fontWeight: 600, color: isSelected ? 'var(--accent-primary)' : '#fff' }}>
+                                  {u.val}
+                                </span>
+                                <button 
+                                  type="button"
+                                  className="btn-card-icon interactive" 
+                                  style={{ padding: '4px' }}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    copyToClipboard(u.val, `${u.type} Username`);
+                                  }}
+                                  title="Copy username"
+                                >
+                                  <Copy size={12} />
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 2. SUGGESTED PASSWORDS (GAME LORE & LEET) */}
                   {gamePasswordSuggestions && (
-                    <div className="suggestions-grid">
-                      {/* Lore Based */}
-                      <div className="suggestion-card">
-                        <div className="suggestion-card-header">
-                          <span className="suggestion-type">Lore-Based</span>
-                          <div className="strength-indicator">
-                            <span style={{ fontSize: '10px', color: 'var(--color-text-dim)' }}>STRENGTH:</span>
-                            <div className="strength-bar" style={{ width: '30px' }}>
-                              <div className={`strength-fill ${checkPasswordStrength(gamePasswordSuggestions.loreBased)}`}></div>
-                            </div>
-                          </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                      <div className="suggestions-section-header">
+                        <div className="suggestions-section-tag">
+                          <Lock size={13} />
+                          <span>2. SUGGESTED PASSWORD (ENCRYPTED & GAME-THEMED)</span>
                         </div>
-                        <div className="suggestion-value-box">
-                          <span className="suggestion-val">{gamePasswordSuggestions.loreBased}</span>
-                          <button 
-                            className="btn-card-icon interactive" 
-                            style={{ padding: '4px' }}
-                            onClick={() => copyToClipboard(gamePasswordSuggestions.loreBased, 'Lore Password')}
-                          >
-                            <Copy size={13} />
-                          </button>
-                        </div>
-                        <div className="suggestion-actions">
-                          <button 
-                            className="btn-apply-key interactive"
-                            onClick={() => handleApplyGamePassword(gamePasswordSuggestions.loreBased)}
-                          >
-                            APPLY TO NEW KEY
-                          </button>
-                        </div>
+                        <span className="suggestions-section-hint">
+                          Applies "{selectedSuggestedUsername || 'Rake Username'}" + chosen password to registry
+                        </span>
                       </div>
 
-                      {/* Leet Style */}
-                      <div className="suggestion-card">
-                        <div className="suggestion-card-header">
-                          <span className="suggestion-type">Leet-Style</span>
-                          <div className="strength-indicator">
-                            <span style={{ fontSize: '10px', color: 'var(--color-text-dim)' }}>STRENGTH:</span>
-                            <div className="strength-bar" style={{ width: '30px' }}>
-                              <div className={`strength-fill ${checkPasswordStrength(gamePasswordSuggestions.leetStyle)}`}></div>
+                      <div className="suggestions-grid">
+                        {/* Lore Based */}
+                        <div className="suggestion-card">
+                          <div className="suggestion-card-header">
+                            <span className="suggestion-type">Lore-Based</span>
+                            <div className="strength-indicator">
+                              <span style={{ fontSize: '10px', color: 'var(--color-text-dim)' }}>STRENGTH:</span>
+                              <div className="strength-bar" style={{ width: '30px' }}>
+                                <div className={`strength-fill ${checkPasswordStrength(gamePasswordSuggestions.loreBased)}`}></div>
+                              </div>
                             </div>
                           </div>
+                          <div className="suggestion-value-box">
+                            <span className="suggestion-val">{gamePasswordSuggestions.loreBased}</span>
+                            <button 
+                              className="btn-card-icon interactive" 
+                              style={{ padding: '4px' }}
+                              onClick={() => copyToClipboard(gamePasswordSuggestions.loreBased, 'Lore Password')}
+                            >
+                              <Copy size={13} />
+                            </button>
+                          </div>
+                          <div className="suggestion-actions">
+                            <button 
+                              className="btn-apply-key interactive"
+                              onClick={() => handleApplyGamePassword(gamePasswordSuggestions.loreBased)}
+                            >
+                              APPLY {selectedSuggestedUsername ? `"${selectedSuggestedUsername}" + PASS` : 'TO NEW KEY'}
+                            </button>
+                          </div>
                         </div>
-                        <div className="suggestion-value-box">
-                          <span className="suggestion-val">{gamePasswordSuggestions.leetStyle}</span>
-                          <button 
-                            className="btn-card-icon interactive" 
-                            style={{ padding: '4px' }}
-                            onClick={() => copyToClipboard(gamePasswordSuggestions.leetStyle, 'Leet Password')}
-                          >
-                            <Copy size={13} />
-                          </button>
-                        </div>
-                        <div className="suggestion-actions">
-                          <button 
-                            className="btn-apply-key interactive"
-                            onClick={() => handleApplyGamePassword(gamePasswordSuggestions.leetStyle)}
-                          >
-                            APPLY TO NEW KEY
-                          </button>
-                        </div>
-                      </div>
 
-                      {/* Stealth Short */}
-                      <div className="suggestion-card">
-                        <div className="suggestion-card-header">
-                          <span className="suggestion-type">Stealth-Short</span>
-                          <div className="strength-indicator">
-                            <span style={{ fontSize: '10px', color: 'var(--color-text-dim)' }}>STRENGTH:</span>
-                            <div className="strength-bar" style={{ width: '30px' }}>
-                              <div className={`strength-fill ${checkPasswordStrength(gamePasswordSuggestions.stealthShort)}`}></div>
+                        {/* Leet Style */}
+                        <div className="suggestion-card">
+                          <div className="suggestion-card-header">
+                            <span className="suggestion-type">Leet-Style</span>
+                            <div className="strength-indicator">
+                              <span style={{ fontSize: '10px', color: 'var(--color-text-dim)' }}>STRENGTH:</span>
+                              <div className="strength-bar" style={{ width: '30px' }}>
+                                <div className={`strength-fill ${checkPasswordStrength(gamePasswordSuggestions.leetStyle)}`}></div>
+                              </div>
                             </div>
                           </div>
+                          <div className="suggestion-value-box">
+                            <span className="suggestion-val">{gamePasswordSuggestions.leetStyle}</span>
+                            <button 
+                              className="btn-card-icon interactive" 
+                              style={{ padding: '4px' }}
+                              onClick={() => copyToClipboard(gamePasswordSuggestions.leetStyle, 'Leet Password')}
+                            >
+                              <Copy size={13} />
+                            </button>
+                          </div>
+                          <div className="suggestion-actions">
+                            <button 
+                              className="btn-apply-key interactive"
+                              onClick={() => handleApplyGamePassword(gamePasswordSuggestions.leetStyle)}
+                            >
+                              APPLY {selectedSuggestedUsername ? `"${selectedSuggestedUsername}" + PASS` : 'TO NEW KEY'}
+                            </button>
+                          </div>
                         </div>
-                        <div className="suggestion-value-box">
-                          <span className="suggestion-val">{gamePasswordSuggestions.stealthShort}</span>
-                          <button 
-                            className="btn-card-icon interactive" 
-                            style={{ padding: '4px' }}
-                            onClick={() => copyToClipboard(gamePasswordSuggestions.stealthShort, 'Stealth Password')}
-                          >
-                            <Copy size={13} />
-                          </button>
-                        </div>
-                        <div className="suggestion-actions">
-                          <button 
-                            className="btn-apply-key interactive"
-                            onClick={() => handleApplyGamePassword(gamePasswordSuggestions.stealthShort)}
-                          >
-                            APPLY TO NEW KEY
-                          </button>
+
+                        {/* Stealth Short */}
+                        <div className="suggestion-card">
+                          <div className="suggestion-card-header">
+                            <span className="suggestion-type">Stealth-Short</span>
+                            <div className="strength-indicator">
+                              <span style={{ fontSize: '10px', color: 'var(--color-text-dim)' }}>STRENGTH:</span>
+                              <div className="strength-bar" style={{ width: '30px' }}>
+                                <div className={`strength-fill ${checkPasswordStrength(gamePasswordSuggestions.stealthShort)}`}></div>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="suggestion-value-box">
+                            <span className="suggestion-val">{gamePasswordSuggestions.stealthShort}</span>
+                            <button 
+                              className="btn-card-icon interactive" 
+                              style={{ padding: '4px' }}
+                              onClick={() => copyToClipboard(gamePasswordSuggestions.stealthShort, 'Stealth Password')}
+                            >
+                              <Copy size={13} />
+                            </button>
+                          </div>
+                          <div className="suggestion-actions">
+                            <button 
+                              className="btn-apply-key interactive"
+                              onClick={() => handleApplyGamePassword(gamePasswordSuggestions.stealthShort)}
+                            >
+                              APPLY {selectedSuggestedUsername ? `"${selectedSuggestedUsername}" + PASS` : 'TO NEW KEY'}
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -2226,14 +2326,24 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
 
                 <div className="form-group">
                   <label className="form-label">Username / Account Email</label>
-                  <input 
-                    type="text" 
-                    placeholder="Enter username or email" 
-                    className="form-input"
-                    value={formUsername}
-                    onChange={(e) => setFormUsername(e.target.value)}
-                    required
-                  />
+                  <div className="input-with-button">
+                    <input 
+                      type="text" 
+                      placeholder="Enter username or email" 
+                      className="form-input"
+                      value={formUsername}
+                      onChange={(e) => setFormUsername(e.target.value)}
+                      required
+                    />
+                    <button 
+                      type="button" 
+                      className="btn-input-action interactive"
+                      title="Quick Auto Suggest Rake Username"
+                      onClick={handleQuickSuggestUsername}
+                    >
+                      <Sparkles size={16} />
+                    </button>
+                  </div>
                 </div>
 
                 <div className="form-group">
@@ -2353,13 +2463,24 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
 
                 <div className="form-group">
                   <label className="form-label">Username / Account Email</label>
-                  <input 
-                    type="text" 
-                    className="form-input"
-                    value={formUsername}
-                    onChange={(e) => setFormUsername(e.target.value)}
-                    required
-                  />
+                  <div className="input-with-button">
+                    <input 
+                      type="text" 
+                      placeholder="Enter username or email"
+                      className="form-input"
+                      value={formUsername}
+                      onChange={(e) => setFormUsername(e.target.value)}
+                      required
+                    />
+                    <button 
+                      type="button" 
+                      className="btn-input-action interactive"
+                      title="Quick Auto Suggest Rake Username"
+                      onClick={handleQuickSuggestUsername}
+                    >
+                      <Sparkles size={16} />
+                    </button>
+                  </div>
                 </div>
 
                 <div className="form-group">

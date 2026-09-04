@@ -143,6 +143,42 @@ const gameDatabase: Record<string, GameData> = {
   assassinscreed: {
     nouns: ["EzioAuditore", "Altair", "EdwardKenway", "AnimusMachine", "BrotherhoodCreed", "TemplarTarget", "LeapOfFaith", "HiddenBlade"],
     actions: ["Assassinate", "ClimbTower", "SynchronizeView", "LeapFaith", "AirAssassinate"]
+  },
+  hitman: {
+    nouns: ["Agent47", "DianaBurnwood", "Silverballer", "SilentAssassin", "Barcoded", "ICA"],
+    actions: ["Eliminate", "Disguise", "Subdue", "Infiltrate"]
+  },
+  mafia: {
+    nouns: ["TommyAngelo", "VitoScaletta", "Salieri", "LostHeaven", "EmpireBay", "TommyGun"],
+    actions: ["Extort", "DriveGetaway", "FamilyLoyalty", "Racket"]
+  },
+  forzahorizon: {
+    nouns: ["HorizonFestival", "Supercar", "SpeedTrap", "DriftZone", "GoliathRace", "FestivalLegend"],
+    actions: ["Drift", "Burnout", "FullThrottle", "ApexTurn"]
+  },
+  forza: {
+    nouns: ["HorizonFestival", "Supercar", "SpeedTrap", "DriftZone", "GoliathRace", "FestivalLegend"],
+    actions: ["Drift", "Burnout", "FullThrottle", "ApexTurn"]
+  },
+  cricket: {
+    nouns: ["Century", "Sixer", "Yorker", "Googly", "CoverDrive", "AshesTrophy", "WicketKeeper", "Batsman"],
+    actions: ["HitSix", "BowlOut", "Stump", "SpinTurn"]
+  },
+  meccha: {
+    nouns: ["Chameleon", "StealthCamouflage", "CyberScale", "PrismSkin"],
+    actions: ["Cloak", "Adapt", "SurpriseStrike"]
+  },
+  rockstar: {
+    nouns: ["SocialClub", "RockstarGames", "LibertyCity", "SanAndreas"],
+    actions: ["WantedLevel", "FiveStar", "Getaway"]
+  },
+  farcry: {
+    nouns: ["PaganMin", "Vaas", "Kyrat", "RookIslands", "JosephSeed", "GunsForHire"],
+    actions: ["LiberateOutpost", "Takedown", "WingsuitGlide"]
+  },
+  watchdogs: {
+    nouns: ["AidenPearce", "DedSec", "CtOS", "MarcusHolloway", "Wrench"],
+    actions: ["Blackout", "HackCameras", "TrafficOverride"]
   }
 };
 
@@ -256,3 +292,124 @@ export function generatePasswordsFromGame(gameName: string): SuggestedPasswords 
     stealthShort
   };
 }
+
+export interface SuggestedUsernames {
+  rakeClassic: string;   // e.g. "Rake_Cyberpunk", "Rake_Hitman", "Rake_Rockstar"
+  rakexuraTag: string;   // e.g. "Rakexura_cric", "rakexura_fh6", "rakexura_cp2077"
+  loreHybrid: string;    // e.g. "Rake_Agent47", "Rake_Geralt", "Rake_Silverhand"
+  stealthRake: string;   // e.g. "rake_hitman", "rake_general", "rake_w3"
+}
+
+export function generateUsernamesFromGame(gameName: string): SuggestedUsernames {
+  const trimmed = gameName.trim();
+  const normalized = trimmed.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+  // Game specific alias and mapping table matching Rake / Rakexura's signature style
+  const aliasMap: Record<string, { short: string; tag: string; lore?: string }> = {
+    cricket: { short: "Cricket", tag: "cric", lore: "Batsman" },
+    forza: { short: "Forza", tag: "fh6", lore: "Horizon" },
+    forzahorizon: { short: "Forza", tag: "fh6", lore: "Horizon" },
+    hitman: { short: "Hitman", tag: "hitman", lore: "Agent47" },
+    mafia: { short: "Mafia", tag: "mafia", lore: "Tommy" },
+    rockstar: { short: "Rockstar", tag: "rockstar", lore: "Outlaw" },
+    meccha: { short: "Meccha", tag: "meccha", lore: "Chameleon" },
+    cyberpunk: { short: "Cyberpunk", tag: "cp2077", lore: "Silverhand" },
+    witcher: { short: "Witcher", tag: "w3", lore: "Geralt" },
+    gta: { short: "GTA", tag: "gta", lore: "Trevor" },
+    grandtheftauto: { short: "GTA", tag: "gta", lore: "Trevor" },
+    valorant: { short: "Valorant", tag: "val", lore: "Jett" },
+    cs2: { short: "CS2", tag: "cs2", lore: "GlobalElite" },
+    counterstrike: { short: "CS2", tag: "cs2", lore: "GlobalElite" },
+    csgo: { short: "CSGO", tag: "csgo", lore: "GlobalElite" },
+    eldenring: { short: "Elden", tag: "elden", lore: "Tarnished" },
+    darksouls: { short: "DarkSouls", tag: "souls", lore: "AshenOne" },
+    reddeadredemption: { short: "RDR2", tag: "rdr2", lore: "Arthur" },
+    rdr2: { short: "RDR2", tag: "rdr2", lore: "Arthur" },
+    godofwar: { short: "GodOfWar", tag: "gow", lore: "Kratos" },
+    spiderman: { short: "SpiderMan", tag: "spidey", lore: "Parker" },
+    farcry: { short: "FarCry", tag: "fc", lore: "Kyrat" },
+    watchdogs: { short: "WatchDogs", tag: "wd", lore: "DedSec" },
+    minecraft: { short: "Minecraft", tag: "mc", lore: "Steve" },
+    fortnite: { short: "Fortnite", tag: "fn", lore: "Jonesy" },
+    apexlegends: { short: "Apex", tag: "apex", lore: "Wraith" },
+    halo: { short: "Halo", tag: "halo", lore: "Chief" },
+    fallout: { short: "Fallout", tag: "vault", lore: "VaultBoy" },
+    assassinscreed: { short: "AC", tag: "ac", lore: "Ezio" },
+    fifa: { short: "FIFA", tag: "fifa", lore: "Striker" },
+    eafc: { short: "FC25", tag: "fc25", lore: "Striker" }
+  };
+
+  let shortTitle = "";
+  let tagSlug = "";
+  let loreNoun = "";
+
+  for (const aliasKey of Object.keys(aliasMap)) {
+    if (normalized.includes(aliasKey) || aliasKey.includes(normalized)) {
+      shortTitle = aliasMap[aliasKey].short;
+      tagSlug = aliasMap[aliasKey].tag;
+      loreNoun = aliasMap[aliasKey].lore || "";
+      break;
+    }
+  }
+
+  // Fallback extraction
+  if (!shortTitle) {
+    const rawWords = trimmed
+      .replace(/^(the|a|an)\s+/i, "")
+      .split(/[\s_-]+/)
+      .map(w => w.replace(/[^A-Za-z0-9]/g, ""))
+      .filter(w => w.length > 0);
+
+    if (rawWords.length > 0) {
+      shortTitle = rawWords[0].charAt(0).toUpperCase() + rawWords[0].slice(1);
+      if (rawWords.length > 1 && (rawWords[1].length <= 4 || /^\d+$/.test(rawWords[1]))) {
+        shortTitle += rawWords[1].toUpperCase();
+      }
+      tagSlug = rawWords.map(w => w[0].toLowerCase()).join("");
+      if (tagSlug.length < 3) tagSlug = rawWords[0].slice(0, 4).toLowerCase();
+    } else {
+      shortTitle = "Gamer";
+      tagSlug = "vault";
+    }
+  }
+
+  // Match database key for lore noun if not set
+  if (!loreNoun) {
+    let databaseMatchKey = "";
+    for (const key of Object.keys(gameDatabase)) {
+      if (normalized.includes(key) || key.includes(normalized)) {
+        databaseMatchKey = key;
+        break;
+      }
+    }
+    if (databaseMatchKey && gameDatabase[databaseMatchKey] && gameDatabase[databaseMatchKey].nouns.length > 0) {
+      loreNoun = getRandomElement(gameDatabase[databaseMatchKey].nouns);
+    } else {
+      loreNoun = shortTitle;
+    }
+  }
+
+  loreNoun = loreNoun.replace(/[^A-Za-z0-9]/g, "");
+
+  const rakeClassic = `Rake_${shortTitle}`;
+  const rakexuraTag = tagSlug.length <= 4 && isNaN(Number(tagSlug)) ? `Rakexura_${tagSlug}` : `rakexura_${tagSlug}`;
+  const loreHybrid = `Rake_${loreNoun}`;
+  const stealthRake = `rake_${tagSlug.toLowerCase()}`;
+
+  return {
+    rakeClassic,
+    rakexuraTag,
+    loreHybrid,
+    stealthRake
+  };
+}
+
+export function quickSuggestRakeUsername(gameOrPlatform: string): string {
+  if (!gameOrPlatform || !gameOrPlatform.trim()) {
+    const defaultRakeTags = ["Rake_Vault", "rake_general", "Rakexura_gamer", "Rake_Pro"];
+    return getRandomElement(defaultRakeTags);
+  }
+  const suggestions = generateUsernamesFromGame(gameOrPlatform);
+  return suggestions.rakeClassic;
+}
+
