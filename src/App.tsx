@@ -412,8 +412,8 @@ export default function App() {
         const dx = mousePos.current.x - prev.x;
         const dy = mousePos.current.y - prev.y;
         return {
-          x: prev.x + dx * 0.15,
-          y: prev.y + dy * 0.15
+          x: prev.x + dx * 0.28,
+          y: prev.y + dy * 0.28
         };
       });
       requestRef.current = requestAnimationFrame(updateFollower);
@@ -1493,6 +1493,7 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
   const nvidiaCount = vaultItems.filter(item => item.category === 'nvidia').length;
   const ubisoftCount = vaultItems.filter(item => item.category === 'ubisoft').length;
   const customCount = vaultItems.filter(item => item.category === 'custom').length;
+  const calcPercent = (count: number) => (totalKeys > 0 ? ((count / totalKeys) * 100).toFixed(0) : '0');
 
   return (
     <div className="vault-container">
@@ -1640,42 +1641,188 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
           </header>
 
           <main className="vault-main">
-            {/* STATS RACKS */}
-            <section className="stats-grid">
-              <div className="stat-card total">
-                <div className="stat-label">TOTAL KEYS SECURED</div>
-                <div className="stat-value">{totalKeys}</div>
-                <div className="stat-glow"></div>
+            {/* VAULT TELEMETRY & DISTRIBUTION DECK */}
+            <section className="telemetry-hub">
+              <div className="telemetry-top">
+                <div className="telemetry-title-box">
+                  <span className="telemetry-badge">TELEMETRY</span>
+                  <h2 className="telemetry-title">VAULT REPOSITORY METRICS</h2>
+                </div>
+                <div className="telemetry-cipher-badge">
+                  <div className="pulse-dot" style={{ backgroundColor: '#00d68f', boxShadow: '0 0 8px #00d68f' }} />
+                  <span>CIPHER: AES-256-GCM // HARDENED</span>
+                </div>
               </div>
-              <div className="stat-card steam">
-                <div className="stat-label">STEAM KEYS</div>
-                <div className="stat-value">{steamCount}</div>
-                <div className="stat-glow"></div>
-              </div>
-              <div className="stat-card epic">
-                <div className="stat-label">EPIC GAMES KEYS</div>
-                <div className="stat-value">{epicCount}</div>
-                <div className="stat-glow"></div>
-              </div>
-              <div className="stat-card xbox">
-                <div className="stat-label">XBOX LIVE KEYS</div>
-                <div className="stat-value">{xboxCount}</div>
-                <div className="stat-glow"></div>
-              </div>
-              <div className="stat-card nvidia">
-                <div className="stat-label">NVIDIA PORTALS</div>
-                <div className="stat-value">{nvidiaCount}</div>
-                <div className="stat-glow"></div>
-              </div>
-              <div className="stat-card ubisoft">
-                <div className="stat-label">UBISOFT CONNECT</div>
-                <div className="stat-value">{ubisoftCount}</div>
-                <div className="stat-glow"></div>
-              </div>
-              <div className="stat-card custom">
-                <div className="stat-label">CUSTOM KEYS</div>
-                <div className="stat-value">{customCount}</div>
-                <div className="stat-glow"></div>
+
+              {/* Proportional Platform Distribution Share Track */}
+              {totalKeys > 0 && (
+                <div className="distribution-track-wrap" title="Vault platform distribution (click a segment to filter)">
+                  <div className="distribution-track">
+                    {steamCount > 0 && (
+                      <div 
+                        className="dist-seg dist-steam interactive"
+                        style={{ width: `${(steamCount / totalKeys) * 100}%` }}
+                        onClick={() => setActiveTab('steam')}
+                        title={`Steam: ${steamCount} keys (${calcPercent(steamCount)}%)`}
+                      />
+                    )}
+                    {epicCount > 0 && (
+                      <div 
+                        className="dist-seg dist-epic interactive"
+                        style={{ width: `${(epicCount / totalKeys) * 100}%` }}
+                        onClick={() => setActiveTab('epic')}
+                        title={`Epic Games: ${epicCount} keys (${calcPercent(epicCount)}%)`}
+                      />
+                    )}
+                    {xboxCount > 0 && (
+                      <div 
+                        className="dist-seg dist-xbox interactive"
+                        style={{ width: `${(xboxCount / totalKeys) * 100}%` }}
+                        onClick={() => setActiveTab('xbox')}
+                        title={`Xbox Live: ${xboxCount} keys (${calcPercent(xboxCount)}%)`}
+                      />
+                    )}
+                    {nvidiaCount > 0 && (
+                      <div 
+                        className="dist-seg dist-nvidia interactive"
+                        style={{ width: `${(nvidiaCount / totalKeys) * 100}%` }}
+                        onClick={() => setActiveTab('nvidia')}
+                        title={`GeForce Now: ${nvidiaCount} keys (${calcPercent(nvidiaCount)}%)`}
+                      />
+                    )}
+                    {ubisoftCount > 0 && (
+                      <div 
+                        className="dist-seg dist-ubisoft interactive"
+                        style={{ width: `${(ubisoftCount / totalKeys) * 100}%` }}
+                        onClick={() => setActiveTab('ubisoft')}
+                        title={`Ubisoft Connect: ${ubisoftCount} keys (${calcPercent(ubisoftCount)}%)`}
+                      />
+                    )}
+                    {customCount > 0 && (
+                      <div 
+                        className="dist-seg dist-custom interactive"
+                        style={{ width: `${(customCount / totalKeys) * 100}%` }}
+                        onClick={() => setActiveTab('custom')}
+                        title={`Custom Portals: ${customCount} keys (${calcPercent(customCount)}%)`}
+                      />
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Interactive Telemetry Rack Cards */}
+              <div className="stats-grid">
+                <div 
+                  className={`stat-card total interactive ${activeTab === 'all' ? 'active-filter' : ''}`}
+                  onClick={() => setActiveTab('all')}
+                  title="Click to view all secured keys"
+                >
+                  <div className="stat-card-top">
+                    <span className="stat-label">TOTAL SECURED</span>
+                    <span className="stat-pill-badge">ALL</span>
+                  </div>
+                  <div className="stat-val-container">
+                    <span className="stat-value">{totalKeys}</span>
+                    <span className="stat-unit">KEYS</span>
+                  </div>
+                  <div className="stat-glow"></div>
+                </div>
+
+                <div 
+                  className={`stat-card steam interactive ${activeTab === 'steam' ? 'active-filter' : ''}`}
+                  onClick={() => setActiveTab('steam')}
+                  title="Click to filter by Steam credentials"
+                >
+                  <div className="stat-card-top">
+                    <span className="stat-label">STEAM</span>
+                    <span className="stat-percent-badge">{calcPercent(steamCount)}%</span>
+                  </div>
+                  <div className="stat-val-container">
+                    <span className="stat-value">{steamCount}</span>
+                    <span className="stat-unit">KEYS</span>
+                  </div>
+                  <div className="stat-glow"></div>
+                </div>
+
+                <div 
+                  className={`stat-card epic interactive ${activeTab === 'epic' ? 'active-filter' : ''}`}
+                  onClick={() => setActiveTab('epic')}
+                  title="Click to filter by Epic Games credentials"
+                >
+                  <div className="stat-card-top">
+                    <span className="stat-label">EPIC GAMES</span>
+                    <span className="stat-percent-badge">{calcPercent(epicCount)}%</span>
+                  </div>
+                  <div className="stat-val-container">
+                    <span className="stat-value">{epicCount}</span>
+                    <span className="stat-unit">KEYS</span>
+                  </div>
+                  <div className="stat-glow"></div>
+                </div>
+
+                <div 
+                  className={`stat-card xbox interactive ${activeTab === 'xbox' ? 'active-filter' : ''}`}
+                  onClick={() => setActiveTab('xbox')}
+                  title="Click to filter by Xbox credentials"
+                >
+                  <div className="stat-card-top">
+                    <span className="stat-label">XBOX LIVE</span>
+                    <span className="stat-percent-badge">{calcPercent(xboxCount)}%</span>
+                  </div>
+                  <div className="stat-val-container">
+                    <span className="stat-value">{xboxCount}</span>
+                    <span className="stat-unit">KEYS</span>
+                  </div>
+                  <div className="stat-glow"></div>
+                </div>
+
+                <div 
+                  className={`stat-card nvidia interactive ${activeTab === 'nvidia' ? 'active-filter' : ''}`}
+                  onClick={() => setActiveTab('nvidia')}
+                  title="Click to filter by GeForce / Nvidia credentials"
+                >
+                  <div className="stat-card-top">
+                    <span className="stat-label">GEFORCE NOW</span>
+                    <span className="stat-percent-badge">{calcPercent(nvidiaCount)}%</span>
+                  </div>
+                  <div className="stat-val-container">
+                    <span className="stat-value">{nvidiaCount}</span>
+                    <span className="stat-unit">KEYS</span>
+                  </div>
+                  <div className="stat-glow"></div>
+                </div>
+
+                <div 
+                  className={`stat-card ubisoft interactive ${activeTab === 'ubisoft' ? 'active-filter' : ''}`}
+                  onClick={() => setActiveTab('ubisoft')}
+                  title="Click to filter by Ubisoft credentials"
+                >
+                  <div className="stat-card-top">
+                    <span className="stat-label">UBISOFT</span>
+                    <span className="stat-percent-badge">{calcPercent(ubisoftCount)}%</span>
+                  </div>
+                  <div className="stat-val-container">
+                    <span className="stat-value">{ubisoftCount}</span>
+                    <span className="stat-unit">KEYS</span>
+                  </div>
+                  <div className="stat-glow"></div>
+                </div>
+
+                <div 
+                  className={`stat-card custom interactive ${activeTab === 'custom' ? 'active-filter' : ''}`}
+                  onClick={() => setActiveTab('custom')}
+                  title="Click to filter by Custom / Standalone credentials"
+                >
+                  <div className="stat-card-top">
+                    <span className="stat-label">CUSTOM</span>
+                    <span className="stat-percent-badge">{calcPercent(customCount)}%</span>
+                  </div>
+                  <div className="stat-val-container">
+                    <span className="stat-value">{customCount}</span>
+                    <span className="stat-unit">KEYS</span>
+                  </div>
+                  <div className="stat-glow"></div>
+                </div>
               </div>
             </section>
 
@@ -1683,24 +1830,49 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
             <section className="control-hub">
               <div className="hub-top">
                 <div className="search-wrapper">
-                  <Search size={18} className="search-icon" />
+                  <Search size={16} className="search-icon" />
                   <input 
                     ref={searchInputRef}
                     type="text" 
-                    placeholder="SEARCH SECURED LAUNCHERS (Ctrl+K)..." 
+                    placeholder="Search keys, launchers, or games..." 
                     className="search-input"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Escape') {
+                        setSearchQuery('');
+                        searchInputRef.current?.blur();
+                      }
+                    }}
                   />
-                  {searchQuery && (
-                    <button 
-                      onClick={() => setSearchQuery('')}
-                      className="search-clear-btn"
-                      title="Clear search"
-                    >
-                      <X size={14} />
-                    </button>
-                  )}
+                  <div className="search-right-deck">
+                    {searchQuery ? (
+                      <>
+                        <span className="search-match-count">
+                          {filteredItems.length} {filteredItems.length === 1 ? 'MATCH' : 'MATCHES'}
+                        </span>
+                        <button 
+                          onClick={() => {
+                            setSearchQuery('');
+                            searchInputRef.current?.focus();
+                          }}
+                          className="search-clear-btn"
+                          title="Clear search (Esc)"
+                        >
+                          <X size={13} />
+                        </button>
+                      </>
+                    ) : (
+                      <div 
+                        className="search-kbd-badge" 
+                        onClick={() => searchInputRef.current?.focus()}
+                        title="Press Ctrl+K to search"
+                      >
+                        <kbd>CTRL</kbd>
+                        <kbd>K</kbd>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 <div className="hub-actions">
@@ -1734,7 +1906,8 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
                   onClick={() => setActiveTab('all')}
                 >
                   <Laptop size={14} />
-                  <HoverScrambleText text="ALL CREDENTIALS" />
+                  <HoverScrambleText text="ALL" />
+                  <span className="tab-count">{totalKeys}</span>
                 </button>
                 <button 
                   className={`category-tab tab-steam interactive ${activeTab === 'steam' ? 'active' : ''}`}
@@ -1742,13 +1915,15 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
                 >
                   <SteamIcon size={15} />
                   <HoverScrambleText text="STEAM" />
+                  <span className="tab-count">{steamCount}</span>
                 </button>
                 <button 
                   className={`category-tab tab-epic interactive ${activeTab === 'epic' ? 'active' : ''}`}
                   onClick={() => setActiveTab('epic')}
                 >
                   <EpicGamesIcon size={15} />
-                  <HoverScrambleText text="EPIC GAMES" />
+                  <HoverScrambleText text="EPIC" />
+                  <span className="tab-count">{epicCount}</span>
                 </button>
                 <button 
                   className={`category-tab tab-xbox interactive ${activeTab === 'xbox' ? 'active' : ''}`}
@@ -1756,6 +1931,7 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
                 >
                   <XboxIcon size={15} />
                   <HoverScrambleText text="XBOX" />
+                  <span className="tab-count">{xboxCount}</span>
                 </button>
                 <button 
                   className={`category-tab tab-nvidia interactive ${activeTab === 'nvidia' ? 'active' : ''}`}
@@ -1763,6 +1939,7 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
                 >
                   <NvidiaIcon size={15} />
                   <HoverScrambleText text="NVIDIA" />
+                  <span className="tab-count">{nvidiaCount}</span>
                 </button>
                 <button 
                   className={`category-tab tab-ubisoft interactive ${activeTab === 'ubisoft' ? 'active' : ''}`}
@@ -1770,6 +1947,7 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
                 >
                   <UbisoftIcon size={15} />
                   <HoverScrambleText text="UBISOFT" />
+                  <span className="tab-count">{ubisoftCount}</span>
                 </button>
                 <button 
                   className={`category-tab tab-custom interactive ${activeTab === 'custom' ? 'active' : ''}`}
@@ -1777,6 +1955,7 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
                 >
                   <Shield size={15} />
                   <HoverScrambleText text="CUSTOM" />
+                  <span className="tab-count">{customCount}</span>
                 </button>
               </div>
             </section>
