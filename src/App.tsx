@@ -1695,7 +1695,7 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
                   {searchQuery && (
                     <button 
                       onClick={() => setSearchQuery('')}
-                      style={{ background: 'transparent', border: 'none', color: '#888', cursor: 'pointer', padding: '0 8px' }}
+                      className="search-clear-btn"
                       title="Clear search"
                     >
                       <X size={14} />

@@ -149,10 +149,23 @@ html {
   border-width: 0 1.5px 1.5px 0;
 }
 
+/* Hide custom HUD cursor when typing/hovering over text inputs so the native text caret is clean */
+body:has(input:hover) .custom-cursor,
+body:has(input:hover) .custom-cursor-follower,
+body:has(input:focus) .custom-cursor,
+body:has(input:focus) .custom-cursor-follower,
+body:has(textarea:hover) .custom-cursor,
+body:has(textarea:hover) .custom-cursor-follower,
+body:has(textarea:focus) .custom-cursor,
+body:has(textarea:focus) .custom-cursor-follower {
+  opacity: 0 !important;
+  visibility: hidden;
+  transition: opacity 0.15s ease;
+}
+
 /* Lock-On Target State on Interactive Hover */
 body:has(button:hover) .custom-cursor.hud-crosshair,
 body:has(a:hover) .custom-cursor.hud-crosshair,
-body:has(input:hover) .custom-cursor.hud-crosshair,
 body:has(select:hover) .custom-cursor.hud-crosshair,
 body:has(.interactive:hover) .custom-cursor.hud-crosshair {
   width: 8px;
@@ -163,7 +176,6 @@ body:has(.interactive:hover) .custom-cursor.hud-crosshair {
 
 body:has(button:hover) .custom-cursor-follower.hud-reticle,
 body:has(a:hover) .custom-cursor-follower.hud-reticle,
-body:has(input:hover) .custom-cursor-follower.hud-reticle,
 body:has(select:hover) .custom-cursor-follower.hud-reticle,
 body:has(.interactive:hover) .custom-cursor-follower.hud-reticle {
   width: 40px;
@@ -173,7 +185,6 @@ body:has(.interactive:hover) .custom-cursor-follower.hud-reticle {
 
 body:has(button:hover) .reticle-corner,
 body:has(a:hover) .reticle-corner,
-body:has(input:hover) .reticle-corner,
 body:has(select:hover) .reticle-corner,
 body:has(.interactive:hover) .reticle-corner {
   width: 9px;
