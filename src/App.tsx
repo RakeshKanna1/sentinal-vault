@@ -2343,17 +2343,12 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
 
                           <div className="card-center">
                             {item.gamesList && item.gamesList.length > 0 ? (
-                              <div className="card-games-container" title={item.gamesList.join(', ')}>
-                                {item.gamesList.slice(0, 3).map((game, idx) => (
+                              <div className="card-games-container">
+                                {item.gamesList.map((game, idx) => (
                                   <span key={idx} className="game-tag-badge">
-                                    🎮 {game}
+                                    {game}
                                   </span>
                                 ))}
-                                {item.gamesList.length > 3 && (
-                                  <span className="game-tag-badge overflow-badge" title={item.gamesList.slice(3).join(', ')}>
-                                    +{item.gamesList.length - 3} more
-                                  </span>
-                                )}
                               </div>
                             ) : (
                               <div className="card-games-container empty" />

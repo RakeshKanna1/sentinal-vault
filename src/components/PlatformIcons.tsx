@@ -28,9 +28,14 @@ export const EpicGamesIcon: React.FC<IconProps> = ({ size = 16, className = "", 
 
 // Ubisoft Official Optical Swirl
 export const UbisoftIcon: React.FC<IconProps> = ({ size = 16, className = "", style = {} }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" className={className} style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0, ...style }}>
-    <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 3.3c4.805 0 8.7 3.895 8.7 8.7 0 4.805-3.895 8.7-8.7 8.7-4.805 0-8.7-3.895-8.7-8.7 0-4.805 3.895-8.7 8.7-8.7zm0 2.7c-3.314 0-6 2.686-6 6 0 1.942.923 3.668 2.355 4.766l1.455-1.94A3.59 3.59 0 0 1 8.4 12c0-1.989 1.611-3.6 3.6-3.6s3.6 1.611 3.6 3.6c0 .884-.319 1.693-.85 2.32l1.64 1.785A5.96 5.96 0 0 0 18 12c0-3.314-2.686-6-6-6z"/>
-  </svg>
+  <img 
+    src="/assets/ubisoft-logo.png" 
+    alt="Ubisoft" 
+    width={size} 
+    height={size} 
+    className={className} 
+    style={{ width: `${size}px`, height: `${size}px`, objectFit: 'contain', display: 'inline-block', verticalAlign: 'middle', filter: 'brightness(0) invert(1)', flexShrink: 0, ...style }} 
+  />
 );
 
 // Microsoft Xbox Authentic Logo
