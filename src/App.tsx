@@ -1648,9 +1648,9 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
                   <span className="telemetry-badge">TELEMETRY</span>
                   <h2 className="telemetry-title">VAULT REPOSITORY METRICS</h2>
                 </div>
-                <div className="telemetry-cipher-badge">
+                <div className="telemetry-cipher-badge" title="Protected by AES-256-GCM military-grade encryption">
                   <div className="pulse-dot" style={{ backgroundColor: '#00d68f', boxShadow: '0 0 8px #00d68f' }} />
-                  <span>CIPHER: AES-256-GCM // HARDENED</span>
+                  <span>BANK-GRADE ENCRYPTED VAULT</span>
                 </div>
               </div>
 
