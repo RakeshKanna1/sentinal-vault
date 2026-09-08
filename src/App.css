@@ -906,10 +906,10 @@
 
 /* Interactive Card Design */
 .vault-card {
-  min-height: 300px;
-  height: auto;
+  min-height: 310px;
+  height: 100%;
   position: relative;
-  transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
 }
 
 .vault-card:hover {
@@ -917,26 +917,26 @@
 }
 
 .card-front, .card-back {
-  background: rgba(12, 15, 24, 0.65);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(13, 16, 26, 0.72);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
   padding: 20px;
-  min-height: 300px;
+  min-height: 310px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   transition: all 0.3s cubic-bezier(0.32, 0.72, 0, 1);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.08);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.1);
   overflow: hidden;
   box-sizing: border-box;
 }
 
 .vault-card:hover .card-front,
 .vault-card:hover .card-back {
-  border-color: rgba(250, 204, 21, 0.35);
-  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.7), inset 0 1px 1px rgba(255, 255, 255, 0.12), 0 0 30px rgba(250, 204, 21, 0.06);
+  border-color: rgba(250, 204, 21, 0.32);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 0 25px rgba(250, 204, 21, 0.06);
 }
 
 /* Spotlights & Brand Highlights for cards */
@@ -944,17 +944,17 @@
   position: absolute;
   top: -20px;
   right: -20px;
-  width: 100px;
-  height: 100px;
+  width: 110px;
+  height: 110px;
   border-radius: 50%;
   filter: blur(50px);
   opacity: 0.15;
-  transition: opacity 0.5s;
+  transition: opacity 0.4s ease;
   pointer-events: none;
 }
 
 .vault-card:hover .card-brand-glow {
-  opacity: 0.25;
+  opacity: 0.28;
 }
 
 .card-front::after {
@@ -962,9 +962,10 @@
   position: absolute;
   bottom: 0;
   left: 0;
-  width: 4px;
+  width: 3.5px;
   height: 100%;
   background: var(--card-accent);
+  border-radius: 3px 0 0 3px;
 }
 
 /* Custom Platform Colored Borders */
@@ -1040,13 +1041,36 @@
 .card-top-actions {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px;
+  gap: 2px;
+  padding: 3px;
   background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 8px;
   backdrop-filter: blur(10px);
   flex-shrink: 0;
+}
+
+.card-top-actions .btn-card-icon {
+  border: none;
+  background: transparent;
+  padding: 5px;
+  border-radius: 6px;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.card-top-actions .btn-card-icon:hover {
+  background: rgba(255, 255, 255, 0.09);
+  color: #ffffff;
+  transform: scale(1.06);
+}
+
+.card-top-actions .btn-card-icon.danger-hover:hover {
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.15);
 }
 
 .card-username-row {
@@ -1057,15 +1081,15 @@
   width: fit-content;
   max-width: 100%;
   padding: 4px 8px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 6px;
   transition: all 0.2s ease;
 }
 
 .card-username-row:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(250, 204, 21, 0.25);
 }
 
 .card-username {
@@ -1077,39 +1101,87 @@
   white-space: nowrap;
 }
 
-.card-action-dots {
-  background: transparent;
-  border: none;
-  color: var(--color-text-dim);
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
-  transition: color 0.3s;
-}
-
-.card-action-dots:hover {
-  color: #fff;
-}
-
 .card-center {
-  margin: 12px 0;
+  margin: 10px 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.card-games-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin: 8px 0 12px 0;
+  min-height: 26px;
+  align-items: center;
+}
+
+.card-games-container.empty {
+  min-height: 16px;
+  margin: 4px 0 8px 0;
+}
+
+.game-tag-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #cbd5e1;
+  letter-spacing: 0.2px;
+  backdrop-filter: blur(8px);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.game-tag-badge:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(250, 204, 21, 0.3);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.game-tag-badge.overflow-badge {
+  background: rgba(250, 204, 21, 0.08);
+  border-color: rgba(250, 204, 21, 0.25);
+  color: #facc15;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  cursor: pointer;
 }
 
 .credential-field {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: rgba(0, 0, 0, 0.2);
-  border: 1px solid var(--border-dim);
+  background: rgba(5, 7, 13, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   padding: 10px 14px;
-  border-radius: 8px;
+  border-radius: 10px;
   font-family: var(--font-mono);
-  font-size: 14px;
+  font-size: 13.5px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6), 0 1px 0 rgba(255, 255, 255, 0.03);
+  transition: all 0.25s ease;
+}
+
+.credential-field.is-revealed {
+  border-color: rgba(250, 204, 21, 0.35);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.6), 0 0 16px rgba(250, 204, 21, 0.08);
+  background: rgba(9, 11, 19, 0.88);
 }
 
 .credential-value {
   letter-spacing: 0.5px;
-  color: var(--color-text-primary);
+  color: #f8fafc;
+  font-weight: 600;
 }
 
 .credential-value.hidden-pass {
@@ -1130,13 +1202,16 @@
   padding: 6px;
   border-radius: 6px;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-card-icon:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.08);
   color: #fff;
-  border-color: var(--border-focus);
+  border-color: rgba(250, 204, 21, 0.3);
 }
 
 .card-bottom {
@@ -1146,19 +1221,29 @@
   font-size: 11px;
   color: var(--color-text-dim);
   font-family: var(--font-mono);
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
 }
 
 /* Strength Meter */
 .strength-indicator {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
+  padding: 4px 9px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 7px;
+  font-size: 10px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  letter-spacing: 0.5px;
 }
 
 .strength-bar {
-  width: 40px;
+  width: 32px;
   height: 4px;
-  background: #2e303a;
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 2px;
   position: relative;
   overflow: hidden;
@@ -1169,12 +1254,13 @@
   position: absolute;
   left: 0;
   top: 0;
-  transition: width 0.3s, background-color 0.3s;
+  border-radius: 2px;
+  transition: width 0.3s ease, background-color 0.3s ease;
 }
 
-.strength-fill.weak { background-color: #ff4a4a; width: 33%; }
-.strength-fill.medium { background-color: #ffab00; width: 66%; }
-.strength-fill.strong { background-color: #00e676; width: 100%; }
+.strength-fill.weak { background-color: #ef4444; width: 33%; box-shadow: 0 0 8px rgba(239, 68, 68, 0.6); }
+.strength-fill.medium { background-color: #f59e0b; width: 66%; box-shadow: 0 0 8px rgba(245, 158, 11, 0.6); }
+.strength-fill.strong { background-color: #10b981; width: 100%; box-shadow: 0 0 8px rgba(16, 185, 129, 0.6); }
 
 /* Card Back Design (Details & Custom notes) */
 .card-back {

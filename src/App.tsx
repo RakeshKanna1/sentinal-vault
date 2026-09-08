@@ -2342,17 +2342,24 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
                           </div>
 
                           <div className="card-center">
-                            {item.gamesList && item.gamesList.length > 0 && (
-                              <div className="card-games-container" style={{ margin: '8px 0 12px 0', display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
-                                {item.gamesList.map((game, idx) => (
+                            {item.gamesList && item.gamesList.length > 0 ? (
+                              <div className="card-games-container" title={item.gamesList.join(', ')}>
+                                {item.gamesList.slice(0, 3).map((game, idx) => (
                                   <span key={idx} className="game-tag-badge">
                                     🎮 {game}
                                   </span>
                                 ))}
+                                {item.gamesList.length > 3 && (
+                                  <span className="game-tag-badge overflow-badge" title={item.gamesList.slice(3).join(', ')}>
+                                    +{item.gamesList.length - 3} more
+                                  </span>
+                                )}
                               </div>
+                            ) : (
+                              <div className="card-games-container empty" />
                             )}
 
-                            <div className="credential-field">
+                            <div className={`credential-field ${isRevealed ? 'is-revealed' : ''}`}>
                               {(!decryptedPass && isRevealed) ? (
                                 <button 
                                   className="btn-secondary interactive" 
