@@ -551,8 +551,7 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
 
   const handleGenerateAccessGuide = async (item: CredentialItem) => {
     try {
-      const platKey = item.platform.trim().toLowerCase();
-      let pwd = decryptedPasswords[item.id] || decryptedPasswords[platKey] || item.passwordEncrypted || item.password || '';
+      let pwd = decryptedPasswords[item.id] || item.passwordEncrypted || '';
       
       if (!pwd && item.passwordEncrypted) {
         try {
@@ -962,7 +961,6 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
       // Pre-cache live decrypted passwords using master password
       for (const item of currentList) {
         const rawPass = item.passwordEncrypted || '';
-        const platKey = item.platform.trim().toLowerCase();
         let decrypted = rawPass;
         if (rawPass && rawPass.includes(':') && rawPass.includes('==')) {
           try {
@@ -974,8 +972,7 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
         if (decrypted) {
           setDecryptedPasswords(prev => ({ 
             ...prev, 
-            [item.id]: decrypted,
-            [platKey]: decrypted 
+            [item.id]: decrypted 
           }));
         }
       }
@@ -1015,10 +1012,9 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
       if (data && data.length > 0) {
         // If DB has records, DB is the absolute source of truth!
         data.forEach((item: any) => {
-          const key = (item.platform || '').trim().toLowerCase();
           const itemId = String(item.id);
-          if (!dedupMap.has(key)) {
-            dedupMap.set(key, {
+          if (!dedupMap.has(itemId)) {
+            dedupMap.set(itemId, {
               id: itemId,
               platform: item.platform || 'Custom Launcher',
               username: item.username || '',
@@ -1034,9 +1030,9 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
       } else {
         // Only seed defaults if database is 100% empty (Brand new setup)
         for (const def of DEFAULT_VAULT_ITEMS) {
-          const key = def.platform.trim().toLowerCase();
-          if (!dedupMap.has(key)) {
-            dedupMap.set(key, {
+          const itemId = String(def.id);
+          if (!dedupMap.has(itemId)) {
+            dedupMap.set(itemId, {
               id: def.id,
               platform: def.platform,
               username: def.username,
@@ -1069,7 +1065,6 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
       // Pre-cache live decrypted passwords using master password
       for (const item of cleanList) {
         const rawPass = item.passwordEncrypted || '';
-        const platKey = item.platform.trim().toLowerCase();
         let decrypted = rawPass;
         if (rawPass && rawPass.includes(':') && rawPass.includes('==')) {
           try {
@@ -1081,8 +1076,7 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
         if (decrypted) {
           setDecryptedPasswords(prev => ({ 
             ...prev, 
-            [item.id]: decrypted,
-            [platKey]: decrypted 
+            [item.id]: decrypted 
           }));
         }
       }
@@ -1148,33 +1142,29 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
 
   // Toggle reveal password
   const toggleReveal = async (item: CredentialItem) => {
-    const platKey = item.platform.trim().toLowerCase();
-    const isRevealed = !!revealedItems[item.id] || !!revealedItems[platKey];
+    const isRevealed = !!revealedItems[item.id];
     
-    if (!isRevealed && !decryptedPasswords[item.id] && !decryptedPasswords[platKey]) {
+    if (!isRevealed && !decryptedPasswords[item.id]) {
       await decryptItem(item.id, item.passwordEncrypted, 'password');
     }
 
     setRevealedItems(prev => ({ 
       ...prev, 
-      [item.id]: !isRevealed,
-      [platKey]: !isRevealed 
+      [item.id]: !isRevealed
     }));
   };
 
   // Toggle 3D flip details card
   const toggleFlip = async (item: CredentialItem) => {
-    const platKey = item.platform.trim().toLowerCase();
-    const isFlipped = !!flippedCards[item.id] || !!flippedCards[platKey];
+    const isFlipped = !!flippedCards[item.id];
     
-    if (!isFlipped && !decryptedNotes[item.id] && !decryptedNotes[platKey]) {
+    if (!isFlipped && !decryptedNotes[item.id]) {
       await decryptItem(item.id, item.notesEncrypted, 'notes');
     }
 
     setFlippedCards(prev => ({ 
       ...prev, 
-      [item.id]: !isFlipped,
-      [platKey]: !isFlipped 
+      [item.id]: !isFlipped
     }));
   };
 
@@ -1186,6 +1176,89 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
       return;
     }
 
+    const trimmedPlatform = formPlatform.trim();
+    const trimmedUsername = formUsername.trim();
+
+    // Check if an account for this EXACT platform AND username already exists
+    const existingExact = vaultItems.find(
+      item => item.platform.trim().toLowerCase() === trimmedPlatform.toLowerCase() &&
+              item.username.trim().toLowerCase() === trimmedUsername.toLowerCase()
+    );
+
+    if (existingExact) {
+      const shouldUpdate = window.confirm(
+        `An account for "${existingExact.platform}" with username/email "${existingExact.username}" already exists in your vault.\n\n` +
+        `• Click [OK] to UPDATE this existing account with the new password and details.\n` +
+        `• Click [Cancel] if you want to keep the existing account (you can change the username or platform to save as a separate account).`
+      );
+
+      if (shouldUpdate) {
+        try {
+          const passEnc = formPassword;
+          const notesEnc = formNotes || 'No notes saved.';
+          const gamesParsed = formGames ? formGames.split(',').map(g => g.trim()).filter(Boolean) : undefined;
+
+          const updatedList = vaultItems.map(item => {
+            if (item.id === existingExact.id) {
+              return {
+                ...item,
+                platform: trimmedPlatform,
+                username: trimmedUsername,
+                passwordEncrypted: passEnc,
+                notesEncrypted: notesEnc,
+                gamesList: gamesParsed,
+                category: formCategory,
+                strength: checkPasswordStrength(formPassword),
+                updatedAt: new Date().toLocaleDateString()
+              };
+            }
+            return item;
+          });
+
+          setVaultItems(updatedList);
+          localStorage.setItem('sentinel_vault_items', JSON.stringify(updatedList));
+
+          // Push update to Supabase
+          try {
+            const isNumericId = !isNaN(Number(existingExact.id));
+            if (isNumericId) {
+              await supabase.from('sentinel_vault').update({
+                platform: trimmedPlatform,
+                username: trimmedUsername,
+                password: formPassword,
+                notes: notesEnc,
+                category: formCategory,
+                games_included: formGames || '',
+                updated_at: new Date().toISOString()
+              }).eq('id', Number(existingExact.id));
+            }
+          } catch (sbErr) {
+            console.error("Supabase update error:", sbErr);
+          }
+
+          setDecryptedPasswords(prev => ({ ...prev, [existingExact.id]: formPassword }));
+          setRevealedItems(prev => ({ ...prev, [existingExact.id]: true }));
+
+          // Reset Form
+          setFormPlatform('');
+          setFormUsername('');
+          setFormPassword('');
+          setFormNotes('');
+          setFormGames('');
+          setFormCategory('custom');
+          setShowAddModal(false);
+          triggerNotification(`Updated password for ${existingExact.platform} (${existingExact.username}) ⚡`);
+          return;
+        } catch (err) {
+          triggerNotification('Failed to update account.');
+          return;
+        }
+      } else {
+        triggerNotification('Account not added. Modify username or platform to save as a separate account.');
+        return;
+      }
+    }
+
     try {
       const passEnc = formPassword;
       const notesEnc = formNotes || 'No notes saved.';
@@ -1195,8 +1268,8 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
       // Push to Supabase Cloud live first
       try {
         const { data: inserted, error: insErr } = await supabase.from('sentinel_vault').insert({
-          platform: formPlatform.trim(),
-          username: formUsername.trim(),
+          platform: trimmedPlatform,
+          username: trimmedUsername,
           password: formPassword,
           notes: notesEnc,
           category: formCategory,
@@ -1213,8 +1286,8 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
 
       const newItem: CredentialItem = {
         id: newId,
-        platform: formPlatform.trim(),
-        username: formUsername.trim(),
+        platform: trimmedPlatform,
+        username: trimmedUsername,
         passwordEncrypted: passEnc,
         notesEncrypted: notesEnc,
         gamesList: gamesParsed,
@@ -1227,9 +1300,8 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
       setVaultItems(updatedList);
       localStorage.setItem('sentinel_vault_items', JSON.stringify(updatedList));
 
-      const platKey = formPlatform.trim().toLowerCase();
-      setDecryptedPasswords(prev => ({ ...prev, [newId]: formPassword, [platKey]: formPassword }));
-      setRevealedItems(prev => ({ ...prev, [newId]: true, [platKey]: true }));
+      setDecryptedPasswords(prev => ({ ...prev, [newId]: formPassword }));
+      setRevealedItems(prev => ({ ...prev, [newId]: true }));
 
       // Reset Form
       setFormPlatform('');
@@ -1288,7 +1360,7 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
       const gamesParsed = formGames ? formGames.split(',').map(g => g.trim()).filter(Boolean) : undefined;
 
       const updatedList = vaultItems.map((item) => {
-        if (item.id === editingItem.id || item.platform.trim().toLowerCase() === editingItem.platform.trim().toLowerCase()) {
+        if (item.id === editingItem.id) {
           return {
             ...item,
             platform: formPlatform.trim(),
@@ -1321,10 +1393,12 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
             updated_at: new Date().toISOString()
           }).eq('id', Number(editingItem.id));
         } else {
-          // Fallback match by platform name case-insensitively
-          const { data: existing } = await supabase.from('sentinel_vault').select('id, platform');
+          // Fallback match by id or exact platform + username
+          const { data: existing } = await supabase.from('sentinel_vault').select('id, platform, username');
           const matched = (existing || []).find((row: any) => 
-            (row.platform || '').trim().toLowerCase() === editingItem.platform.trim().toLowerCase()
+            String(row.id) === String(editingItem.id) ||
+            ((row.platform || '').trim().toLowerCase() === editingItem.platform.trim().toLowerCase() &&
+             (row.username || '').trim().toLowerCase() === editingItem.username.trim().toLowerCase())
           );
 
           if (matched) {
@@ -1353,19 +1427,13 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
         console.error("Supabase update error:", sbErr);
       }
 
-      const platKey = formPlatform.trim().toLowerCase();
-      const oldPlatKey = editingItem.platform.trim().toLowerCase();
       setDecryptedPasswords(prev => ({ 
         ...prev, 
-        [editingItem.id]: formPassword,
-        [platKey]: formPassword,
-        [oldPlatKey]: formPassword
+        [editingItem.id]: formPassword
       }));
       setDecryptedNotes(prev => ({ 
         ...prev, 
-        [editingItem.id]: formNotes,
-        [platKey]: formNotes,
-        [oldPlatKey]: formNotes
+        [editingItem.id]: formNotes
       }));
 
       setShowEditModal(false);
@@ -1390,9 +1458,11 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
           if (isNumericId) {
             await supabase.from('sentinel_vault').delete().eq('id', Number(target.id));
           } else {
-            const { data: existing } = await supabase.from('sentinel_vault').select('id, platform');
+            const { data: existing } = await supabase.from('sentinel_vault').select('id, platform, username');
             const matched = (existing || []).find((row: any) => 
-              (row.platform || '').trim().toLowerCase() === target.platform.trim().toLowerCase()
+              String(row.id) === String(target.id) ||
+              ((row.platform || '').trim().toLowerCase() === target.platform.trim().toLowerCase() &&
+               (row.username || '').trim().toLowerCase() === target.username.trim().toLowerCase())
             );
             if (matched) {
               await supabase.from('sentinel_vault').delete().eq('id', matched.id);
@@ -2278,11 +2348,10 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
                 </div>
               ) : (
                 filteredItems.map((item) => {
-                  const platKey = item.platform.trim().toLowerCase();
-                  const decryptedPass = decryptedPasswords[item.id] || decryptedPasswords[platKey] || item.password || item.passwordEncrypted || '';
-                  const decryptedNote = decryptedNotes[item.id] || decryptedNotes[platKey] || item.notesEncrypted || 'Loading...';
-                  const isRevealed = !!revealedItems[item.id] || !!revealedItems[platKey];
-                  const isFlipped = !!flippedCards[item.id] || !!flippedCards[platKey];
+                  const decryptedPass = decryptedPasswords[item.id] || item.passwordEncrypted || '';
+                  const decryptedNote = decryptedNotes[item.id] || item.notesEncrypted || 'Loading...';
+                  const isRevealed = !!revealedItems[item.id];
+                  const isFlipped = !!flippedCards[item.id];
 
                   return (
                     <div 
@@ -2379,8 +2448,7 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
                                 <button 
                                   className="btn-card-icon interactive"
                                   onClick={async () => {
-                                    const platKey = item.platform.trim().toLowerCase();
-                                    let pass = decryptedPasswords[item.id] || decryptedPasswords[platKey] || item.passwordEncrypted || '';
+                                    let pass = decryptedPasswords[item.id] || item.passwordEncrypted || '';
                                     if (!pass && item.passwordEncrypted) {
                                       try {
                                         pass = await decryptText(item.passwordEncrypted, masterPassword || 'default_key');
