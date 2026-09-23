@@ -1058,6 +1058,28 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
         }
       }
 
+      // Also preserve any locally created items that haven't synced to cloud yet
+      try {
+        const localSaved = localStorage.getItem('sentinel_vault_items');
+        if (localSaved) {
+          const parsedLocal: CredentialItem[] = JSON.parse(localSaved);
+          if (Array.isArray(parsedLocal)) {
+            parsedLocal.forEach(localItem => {
+              const existsInCloud = Array.from(dedupMap.values()).some(
+                c => c.id === localItem.id ||
+                  (c.platform.trim().toLowerCase() === localItem.platform.trim().toLowerCase() &&
+                   c.username.trim().toLowerCase() === localItem.username.trim().toLowerCase())
+              );
+              if (!existsInCloud) {
+                dedupMap.set(localItem.id, localItem);
+              }
+            });
+          }
+        }
+      } catch (e) {
+        console.error("Error checking local vault items during sync:", e);
+      }
+
       const cleanList = Array.from(dedupMap.values());
       setVaultItems(cleanList);
       localStorage.setItem('sentinel_vault_items', JSON.stringify(cleanList));
@@ -1266,6 +1288,7 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
       let newId = Date.now().toString();
 
       // Push to Supabase Cloud live first
+      let cloudSynced = false;
       try {
         const { data: inserted, error: insErr } = await supabase.from('sentinel_vault').insert({
           platform: trimmedPlatform,
@@ -1277,8 +1300,11 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
           updated_at: new Date().toISOString()
         }).select('id');
 
-        if (!insErr && inserted && inserted.length > 0) {
+        if (insErr) {
+          console.error("Supabase insert error:", insErr);
+        } else if (inserted && inserted.length > 0) {
           newId = String(inserted[0].id);
+          cloudSynced = true;
         }
       } catch (sbErr) {
         console.error("Supabase insert error:", sbErr);
@@ -1311,7 +1337,7 @@ ${extraImportant ? extraImportant + '\n' : ''}• Keep the account safe
       setFormGames('');
       setFormCategory('custom');
       setShowAddModal(false);
-      triggerNotification('Gamer Key Saved & Cloud Synced ⚡');
+      triggerNotification(cloudSynced ? 'Gamer Key Saved & Cloud Synced ⚡' : 'Gamer Key Saved Locally (Cloud sync pending) ⚡');
     } catch (err) {
       triggerNotification('Failed to save.');
     }
